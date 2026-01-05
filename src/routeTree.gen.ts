@@ -10,33 +10,63 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PingerIndexRouteImport } from './routes/pinger/index'
+import { Route as PingIndexRouteImport } from './routes/ping/index'
+import { Route as LoginIndexRouteImport } from './routes/login/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PingerIndexRoute = PingerIndexRouteImport.update({
+  id: '/pinger/',
+  path: '/pinger/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PingIndexRoute = PingIndexRouteImport.update({
+  id: '/ping/',
+  path: '/ping/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginIndexRoute = LoginIndexRouteImport.update({
+  id: '/login/',
+  path: '/login/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/login': typeof LoginIndexRoute
+  '/ping': typeof PingIndexRoute
+  '/pinger': typeof PingerIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof LoginIndexRoute
+  '/ping': typeof PingIndexRoute
+  '/pinger': typeof PingerIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/login/': typeof LoginIndexRoute
+  '/ping/': typeof PingIndexRoute
+  '/pinger/': typeof PingerIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/login' | '/ping' | '/pinger'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/login' | '/ping' | '/pinger'
+  id: '__root__' | '/' | '/login/' | '/ping/' | '/pinger/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  LoginIndexRoute: typeof LoginIndexRoute
+  PingIndexRoute: typeof PingIndexRoute
+  PingerIndexRoute: typeof PingerIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +78,35 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/pinger/': {
+      id: '/pinger/'
+      path: '/pinger'
+      fullPath: '/pinger'
+      preLoaderRoute: typeof PingerIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ping/': {
+      id: '/ping/'
+      path: '/ping'
+      fullPath: '/ping'
+      preLoaderRoute: typeof PingIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login/': {
+      id: '/login/'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  LoginIndexRoute: LoginIndexRoute,
+  PingIndexRoute: PingIndexRoute,
+  PingerIndexRoute: PingerIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
