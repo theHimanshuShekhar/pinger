@@ -47,7 +47,7 @@ function RootComponent({ children }: { children: React.ReactNode }) {
       <head>
         <HeadContent />
       </head>
-      <body className="min-h-screen flex flex-col bg-background text-foreground">
+      <body className="min-h-screen min-w-sm flex flex-col bg-background text-foreground">
         <Providers>
           <div className="flex-col min-h-screen flex grow">
             <Header title="Pinger!" user={user} />

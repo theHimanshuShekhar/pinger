@@ -9,7 +9,6 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 const config = defineConfig({
   plugins: [
-    VitePWA({ registerType: 'autoUpdate' }),
     devtools(),
     nitro(),
     // this is the plugin that enables path aliases
@@ -19,6 +18,16 @@ const config = defineConfig({
     tailwindcss(),
     tanstackStart(),
     viteReact(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      workbox: {
+        globDirectory: '.dist',
+        globPatterns: ['**/*.{js,wasm,css,html}'],
+        globIgnores: ['**/node_modules/**/*',
+          "sw.js",
+          "workbox-*.js"],
+      },
+    }),
   ],
 })
 
