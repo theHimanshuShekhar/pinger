@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "vite dev --port 3000",
     "build": "vite build",
+    "start": "node .output/server/index.mjs",
     "preview": "vite preview",
     "test": "vitest run",
     "lint": "eslint",
@@ -59,6 +60,7 @@
     "tsx": "^4.21.0",
     "typescript": "^5.7.2",
     "vite": "^7.1.7",
+    "vite-plugin-pwa": "^1.2.0",
     "vitest": "^3.0.5",
     "web-vitals": "^5.1.0"
   }

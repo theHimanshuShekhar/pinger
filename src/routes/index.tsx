@@ -1,5 +1,4 @@
 import { FriendsList } from "@/components/friendslist";
-import { getUser } from "@/lib/server/functions";
 import { useAuthenticate } from "@daveyplate/better-auth-ui";
 import { createFileRoute, Link } from "@tanstack/react-router";
 

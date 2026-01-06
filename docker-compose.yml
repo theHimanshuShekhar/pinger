@@ -1,6 +1,25 @@
 services:
+  web:
+    build: .
+    container_name: pinger-web
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/pinger
+      BETTER_AUTH_SECRET: "KwbI3f7P4FyNmgCSnL/CFcoity909Y3CohdiGC/8b8s="
+      DISCORD_CLIENT_ID: "1321495402842947584"
+      DISCORD_CLIENT_SECRET: "i6De8Ko7H8yh3IDJLi-NvlQSuxHWq0sq"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   postgres:
-    image: postgres:latest
+    image: postgres:alpine
     container_name: pinger-postgres
     environment:
       POSTGRES_USER: postgres
@@ -9,7 +28,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s

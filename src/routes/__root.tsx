@@ -51,7 +51,7 @@ function RootComponent({ children }: { children: React.ReactNode }) {
         <Providers>
           <div className="flex-col min-h-screen flex grow">
             <Header title="Pinger!" user={user} />
-            <div className='flex grow'>
+            <div className='flex flex-col grow'>
               {children}
               <Toaster />
             </div>
