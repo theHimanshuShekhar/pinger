@@ -15,6 +15,13 @@
       "when": 1767700851301,
       "tag": "0001_nosy_firelord",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1767720131865,
+      "tag": "0002_flashy_penance",
+      "breakpoints": true
     }
   ]
 }

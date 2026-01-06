@@ -5,6 +5,9 @@ import { Toaster } from '@/components/ui/sonner'
 import { Providers } from '@/providers'
 import { QueryClient } from '@tanstack/react-query'
 import { getUser } from '@/lib/server/functions'
+import { useEffect } from 'react'
+import { initializePushNotifications } from '@/lib/push-notifications'
+import { NotFound } from '@/components/not-found'
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
@@ -37,11 +40,23 @@ export const Route = createRootRouteWithContext<{
     ],
     links: [{ rel: "stylesheet", href: appCss }],
   }),
+  notFoundComponent: NotFound,
   shellComponent: RootComponent,
 });
 
 function RootComponent({ children }: { children: React.ReactNode }) {
   const { user } = Route.useLoaderData();
+
+  // Initialize push notifications after user is authenticated
+  useEffect(() => {
+    console.log('User ID in RootComponent:', user?.id);
+    if (user?.id) {
+      initializePushNotifications(user.id).catch((error) => {
+        console.warn('Failed to initialize push notifications:', error);
+      });
+    }
+  }, [user?.id]);
+
   return (
     <html lang="en">
       <head>

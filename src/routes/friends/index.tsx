@@ -19,6 +19,7 @@ export const Route = createFileRoute('/friends/')({
 function RouteComponent() {
   useAuthenticate();
   const { users } = Route.useLoaderData();
+
   return (
     <div className="items-center justify-center flex flex-col p-2 container mx-auto">
       <Input className='bg-gray-900 p-3 w-full rounded' placeholder='Search users...' />
