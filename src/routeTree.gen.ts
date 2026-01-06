@@ -15,6 +15,7 @@ import { Route as PingIndexRouteImport } from './routes/ping/index'
 import { Route as FriendsIndexRouteImport } from './routes/friends/index'
 import { Route as AuthPathRouteImport } from './routes/auth/$path'
 import { Route as ApiPushSubscribeRouteImport } from './routes/api/push/subscribe'
+import { Route as ApiPushSendToUsersRouteImport } from './routes/api/push/send-to-users'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
 const IndexRoute = IndexRouteImport.update({
@@ -47,6 +48,11 @@ const ApiPushSubscribeRoute = ApiPushSubscribeRouteImport.update({
   path: '/api/push/subscribe',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPushSendToUsersRoute = ApiPushSendToUsersRouteImport.update({
+  id: '/api/push/send-to-users',
+  path: '/api/push/send-to-users',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -60,6 +66,7 @@ export interface FileRoutesByFullPath {
   '/ping': typeof PingIndexRoute
   '/pinger': typeof PingerIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/push/send-to-users': typeof ApiPushSendToUsersRoute
   '/api/push/subscribe': typeof ApiPushSubscribeRoute
 }
 export interface FileRoutesByTo {
@@ -69,6 +76,7 @@ export interface FileRoutesByTo {
   '/ping': typeof PingIndexRoute
   '/pinger': typeof PingerIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/push/send-to-users': typeof ApiPushSendToUsersRoute
   '/api/push/subscribe': typeof ApiPushSubscribeRoute
 }
 export interface FileRoutesById {
@@ -79,6 +87,7 @@ export interface FileRoutesById {
   '/ping/': typeof PingIndexRoute
   '/pinger/': typeof PingerIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/push/send-to-users': typeof ApiPushSendToUsersRoute
   '/api/push/subscribe': typeof ApiPushSubscribeRoute
 }
 export interface FileRouteTypes {
@@ -90,6 +99,7 @@ export interface FileRouteTypes {
     | '/ping'
     | '/pinger'
     | '/api/auth/$'
+    | '/api/push/send-to-users'
     | '/api/push/subscribe'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -99,6 +109,7 @@ export interface FileRouteTypes {
     | '/ping'
     | '/pinger'
     | '/api/auth/$'
+    | '/api/push/send-to-users'
     | '/api/push/subscribe'
   id:
     | '__root__'
@@ -108,6 +119,7 @@ export interface FileRouteTypes {
     | '/ping/'
     | '/pinger/'
     | '/api/auth/$'
+    | '/api/push/send-to-users'
     | '/api/push/subscribe'
   fileRoutesById: FileRoutesById
 }
@@ -118,6 +130,7 @@ export interface RootRouteChildren {
   PingIndexRoute: typeof PingIndexRoute
   PingerIndexRoute: typeof PingerIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiPushSendToUsersRoute: typeof ApiPushSendToUsersRoute
   ApiPushSubscribeRoute: typeof ApiPushSubscribeRoute
 }
 
@@ -165,6 +178,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPushSubscribeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/push/send-to-users': {
+      id: '/api/push/send-to-users'
+      path: '/api/push/send-to-users'
+      fullPath: '/api/push/send-to-users'
+      preLoaderRoute: typeof ApiPushSendToUsersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -182,6 +202,7 @@ const rootRouteChildren: RootRouteChildren = {
   PingIndexRoute: PingIndexRoute,
   PingerIndexRoute: PingerIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiPushSendToUsersRoute: ApiPushSendToUsersRoute,
   ApiPushSubscribeRoute: ApiPushSubscribeRoute,
 }
 export const routeTree = rootRouteImport
