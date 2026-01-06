@@ -12,9 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PingerIndexRouteImport } from './routes/pinger/index'
 import { Route as PingIndexRouteImport } from './routes/ping/index'
-import { Route as LoginIndexRouteImport } from './routes/login/index'
+import { Route as FriendsIndexRouteImport } from './routes/friends/index'
 import { Route as AuthPathRouteImport } from './routes/auth/$path'
-import { Route as AccountPathRouteImport } from './routes/account/$path'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
 const IndexRoute = IndexRouteImport.update({
@@ -32,19 +31,14 @@ const PingIndexRoute = PingIndexRouteImport.update({
   path: '/ping/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LoginIndexRoute = LoginIndexRouteImport.update({
-  id: '/login/',
-  path: '/login/',
+const FriendsIndexRoute = FriendsIndexRouteImport.update({
+  id: '/friends/',
+  path: '/friends/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthPathRoute = AuthPathRouteImport.update({
   id: '/auth/$path',
   path: '/auth/$path',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AccountPathRoute = AccountPathRouteImport.update({
-  id: '/account/$path',
-  path: '/account/$path',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
@@ -55,18 +49,16 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/account/$path': typeof AccountPathRoute
   '/auth/$path': typeof AuthPathRoute
-  '/login': typeof LoginIndexRoute
+  '/friends': typeof FriendsIndexRoute
   '/ping': typeof PingIndexRoute
   '/pinger': typeof PingerIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/account/$path': typeof AccountPathRoute
   '/auth/$path': typeof AuthPathRoute
-  '/login': typeof LoginIndexRoute
+  '/friends': typeof FriendsIndexRoute
   '/ping': typeof PingIndexRoute
   '/pinger': typeof PingerIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -74,9 +66,8 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/account/$path': typeof AccountPathRoute
   '/auth/$path': typeof AuthPathRoute
-  '/login/': typeof LoginIndexRoute
+  '/friends/': typeof FriendsIndexRoute
   '/ping/': typeof PingIndexRoute
   '/pinger/': typeof PingerIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -85,27 +76,18 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/account/$path'
     | '/auth/$path'
-    | '/login'
+    | '/friends'
     | '/ping'
     | '/pinger'
     | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/account/$path'
-    | '/auth/$path'
-    | '/login'
-    | '/ping'
-    | '/pinger'
-    | '/api/auth/$'
+  to: '/' | '/auth/$path' | '/friends' | '/ping' | '/pinger' | '/api/auth/$'
   id:
     | '__root__'
     | '/'
-    | '/account/$path'
     | '/auth/$path'
-    | '/login/'
+    | '/friends/'
     | '/ping/'
     | '/pinger/'
     | '/api/auth/$'
@@ -113,9 +95,8 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AccountPathRoute: typeof AccountPathRoute
   AuthPathRoute: typeof AuthPathRoute
-  LoginIndexRoute: typeof LoginIndexRoute
+  FriendsIndexRoute: typeof FriendsIndexRoute
   PingIndexRoute: typeof PingIndexRoute
   PingerIndexRoute: typeof PingerIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
@@ -144,11 +125,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PingIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/login/': {
-      id: '/login/'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginIndexRouteImport
+    '/friends/': {
+      id: '/friends/'
+      path: '/friends'
+      fullPath: '/friends'
+      preLoaderRoute: typeof FriendsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/$path': {
@@ -156,13 +137,6 @@ declare module '@tanstack/react-router' {
       path: '/auth/$path'
       fullPath: '/auth/$path'
       preLoaderRoute: typeof AuthPathRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/account/$path': {
-      id: '/account/$path'
-      path: '/account/$path'
-      fullPath: '/account/$path'
-      preLoaderRoute: typeof AccountPathRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/auth/$': {
@@ -177,9 +151,8 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AccountPathRoute: AccountPathRoute,
   AuthPathRoute: AuthPathRoute,
-  LoginIndexRoute: LoginIndexRoute,
+  FriendsIndexRoute: FriendsIndexRoute,
   PingIndexRoute: PingIndexRoute,
   PingerIndexRoute: PingerIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,

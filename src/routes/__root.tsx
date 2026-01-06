@@ -1,35 +1,47 @@
-import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
+import { HeadContent, Scripts, createRootRouteWithContext } from '@tanstack/react-router'
 import appCss from '../styles.css?url'
 import { Header } from '../components/header'
 import { Toaster } from '@/components/ui/sonner'
-import { Providers } from '@/components/providers'
+import { Providers } from '@/providers'
+import { QueryClient } from '@tanstack/react-query'
+import { getUser } from '@/lib/server/functions'
 
-export const Route = createRootRoute({
+export const Route = createRootRouteWithContext<{
+  queryClient: QueryClient;
+  user: Awaited<ReturnType<typeof getUser>>;
+}>()({
+  beforeLoad: async ({ context }) => {
+    context.queryClient = new QueryClient();
+    const user = await context.queryClient.fetchQuery({
+      queryKey: ["user"],
+      queryFn: ({ signal }) => getUser({ signal }),
+    }); // we're using react-query for caching, see router.tsx
+
+    return { user };
+  },
+  loader: ({ context }) => {
+    return { user: context.user };
+  },
   head: () => ({
     meta: [
       {
-        charSet: 'utf-8',
+        charSet: "utf-8",
       },
       {
-        name: 'viewport',
-        content: 'width=device-width, initial-scale=1',
+        name: "viewport",
+        content: "width=device-width, initial-scale=1",
       },
       {
-        title: 'Pinger!',
+        title: "BhayanakCast",
       },
     ],
-    links: [
-      {
-        rel: 'stylesheet',
-        href: appCss,
-      },
-    ],
+    links: [{ rel: "stylesheet", href: appCss }],
   }),
+  shellComponent: RootComponent,
+});
 
-  shellComponent: RootDocument,
-})
-
-function RootDocument({ children }: { children: React.ReactNode }) {
+function RootComponent({ children }: { children: React.ReactNode }) {
+  const { user } = Route.useLoaderData();
   return (
     <html lang="en">
       <head>
@@ -38,7 +50,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <body className="min-h-screen flex flex-col bg-background text-foreground">
         <Providers>
           <div className="flex-col min-h-screen flex grow">
-            <Header title="Pinger!" />
+            <Header title="Pinger!" user={user} />
             <div className='flex grow'>
               {children}
               <Toaster />
