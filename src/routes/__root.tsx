@@ -1,10 +1,8 @@
 import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { TanStackDevtools } from '@tanstack/react-devtools'
-
 import appCss from '../styles.css?url'
 import { Header } from '../components/header'
-import { ThemeProvider } from '@/components/theme-provider'
+import { Toaster } from '@/components/ui/sonner'
+import { Providers } from '@/components/providers'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -38,14 +36,17 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body className="min-h-screen flex flex-col bg-background text-foreground">
-        <div className="flex-col min-h-screen flex grow">
-          <Header title="Pinger!" />
-          <div className='flex grow'>
-            {children}
+        <Providers>
+          <div className="flex-col min-h-screen flex grow">
+            <Header title="Pinger!" />
+            <div className='flex grow'>
+              {children}
+              <Toaster />
+            </div>
           </div>
-        </div>
+        </Providers>
         <Scripts />
       </body>
-    </html>
+    </html >
   )
 }

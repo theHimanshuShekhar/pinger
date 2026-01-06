@@ -1,7 +1,6 @@
 import { Link } from "@tanstack/react-router"
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { HugeiconsIcon } from '@hugeicons/react';
-import { GameController03FreeIcons } from '@hugeicons/core-free-icons';
+import { GameController03FreeIcons } from '@hugeicons/core-free-icons'; import { UserButton } from "@daveyplate/better-auth-ui";
 
 interface HeaderProps {
   title?: string
@@ -21,12 +20,7 @@ export function Header({ title = "Pinger!" }: HeaderProps) {
         </Link>
 
         <div className="flex items-center gap-2">
-          <Avatar className="size-10">
-            <AvatarImage
-              src="https://github.com/shadcn.png"
-            />
-            <AvatarFallback>LR</AvatarFallback>
-          </Avatar>
+          <UserButton className="bg-background text-primary" />
         </div>
       </div>
     </header>
