@@ -146,16 +146,3 @@ export async function initializePushNotifications(userId: string): Promise<void>
         console.warn('Failed to initialize push notifications:', error);
     }
 }
-
-export async function sendTestNotification(title: string, options?: NotificationOptions): Promise<void> {
-    try {
-        const registration = await navigator.serviceWorker.ready;
-        await registration.showNotification(title, {
-            icon: '/logo192.png',
-            badge: '/favicon.ico',
-            ...options,
-        });
-    } catch (error) {
-        console.error('Failed to send test notification:', error);
-    }
-}

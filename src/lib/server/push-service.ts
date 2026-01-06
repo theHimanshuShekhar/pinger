@@ -204,3 +204,51 @@ export const sendPushNotificationToSelectedUsers = createServerFn(
         }
     }
     )
+async function sendPushNotificationToUser(recipientId: string, payload: PushNotificationPayload): Promise<{ success: number; failed: number }> {
+    try {
+        const webpush = await initializeWebPush();
+
+        // Get all push subscriptions for the recipient
+        const subscriptions = await db
+            .select()
+            .from(pushSubscriptions)
+            .where(eq(pushSubscriptions.userId, recipientId));
+
+        if (subscriptions.length === 0) {
+            return { success: 0, failed: 1 };
+        }
+
+        let success = 0;
+        let failed = 0;
+        const pushPayload = JSON.stringify(payload);
+
+        for (const subscription of subscriptions) {
+            try {
+                await webpush.sendNotification(
+                    {
+                        endpoint: subscription.endpoint,
+                        keys: {
+                            auth: subscription.auth,
+                            p256dh: subscription.p256dh,
+                        },
+                    },
+                    pushPayload
+                );
+                success++;
+            } catch (error) {
+                // Remove invalid subscription if necessary
+                if (error instanceof Error && error.message.includes('410')) {
+                    await db
+                        .delete(pushSubscriptions)
+                        .where(eq(pushSubscriptions.endpoint, subscription.endpoint));
+                }
+                failed++;
+            }
+        }
+
+        return { success, failed };
+    } catch (error) {
+        console.error('Error sending push notification to user:', error);
+        return { success: 0, failed: 1 };
+    }
+}

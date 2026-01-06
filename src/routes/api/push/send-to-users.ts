@@ -31,8 +31,8 @@ export const Route = createFileRoute("/api/push/send-to-users")({
                     console.log("Sending push notification to users:", recipientUserIds);
 
                     // Import and call the server function
-                    const { broadcastPushNotification } = await import("@/lib/server/push-service")
-                    const result = await broadcastPushNotification({ data: { title, message, icon } });
+                    const { sendPushNotificationToSelectedUsers } = await import("@/lib/server/push-service")
+                    const result = await sendPushNotificationToSelectedUsers({ data: { recipientUserIds, title, message, icon } });
 
                     return new Response(
                         JSON.stringify(result),
