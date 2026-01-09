@@ -1,7 +1,9 @@
 import { FriendsList } from "@/components/friendslist";
+import { PendingFriendRequests } from "@/components/pending-friend-requests";
 import { useAuthenticate } from "@daveyplate/better-auth-ui";
 import { createFileRoute } from "@tanstack/react-router";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { getPendingFriendRequests } from "@/lib/server/functions";
 
 export const Route = createFileRoute("/")({
   component: App,
@@ -11,6 +13,15 @@ function App() {
   useAuthenticate();
 
   const { mutate } = useSendPushNotification();
+
+  const { data: pendingRequests = [] } = useQuery({
+    queryKey: ['pendingFriendRequests'],
+    queryFn: async () => await getPendingFriendRequests(),
+    staleTime: 1000 * 30, // 30 seconds
+    refetchInterval: 1000 * 10, // 1 minute
+  });
+
+  const hasPendingRequests = pendingRequests.length > 0;
 
   const handleSend = () => {
     mutate({
@@ -22,15 +33,29 @@ function App() {
   };
 
   return (
-    <div className="grow items-center justify-center flex flex-col gap-4">
-      <h1>Pinger!</h1>
-      <button
-        onClick={handleSend}
-        className="px-4 py-2 bg-blue-500 text-white rounded"
-      >
-        Send Test Notification
-      </button>
-      <FriendsList />
+    <div className="grow items-center justify-center flex flex-col gap-8">
+      <div className={`grid ${hasPendingRequests ? 'grid-cols-3' : 'grid-cols-1'} grow w-full h-full place-items-center`}>
+        <div className="flex flex-col gap-4 col-span-2 p-4 h-full w-full">
+          <button
+            className="px-8 py-4 bg-green-600 hover:bg-green-700 text-white font-bold text-xl transition-colors shadow-lg rounded"
+          >
+            Create a PINGER!
+          </button>
+          <button
+            onClick={handleSend}
+            className="px-4 py-2 bg-blue-500 text-white rounded"
+          >
+            Send Test Notification
+          </button>
+          <FriendsList />
+        </div>
+        {hasPendingRequests && (
+          <div className="w-full h-full border-2">
+            <PendingFriendRequests />
+          </div>
+        )}
+      </div>
+
     </div>
   );
 }

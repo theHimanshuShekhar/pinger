@@ -1,0 +1,1 @@
+ALTER TABLE "users" ALTER COLUMN "global_name" DROP NOT NULL;

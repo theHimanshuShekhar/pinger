@@ -3,6 +3,7 @@ import { boolean, pgTable, text, timestamp } from "drizzle-orm/pg-core"
 export const users = pgTable("users", {
     id: text("id").primaryKey(),
     name: text("name").notNull(),
+    global_name: text("global_name"),
     email: text("email").notNull().unique(),
     emailVerified: boolean("email_verified").notNull(),
     image: text("image"),

@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
-import { ne } from "drizzle-orm";
+import { ne, eq, and } from "drizzle-orm";
 import { auth } from "../auth";
 import { db } from "@/db/db";
 import { users } from "@/db/schema";
@@ -47,3 +47,93 @@ export const addFriendsToList = createServerFn({ method: "POST" })
         await db.insert(friends).values(friendRequests).onConflictDoNothing();
         return { success: true, count: friendRequests.length };
     });
+
+// get pending friend requests for current user
+export const getPendingFriendRequests = createServerFn({ method: "GET" }).handler(
+    async () => {
+        const currentUser = await getUser();
+        if (!currentUser) {
+            throw new Error("User not authenticated");
+        }
+
+        const pendingRequests = await db
+            .select({
+                id: users.id,
+                name: users.name,
+                image: users.image,
+                email: users.email,
+            })
+            .from(friends)
+            .innerJoin(users, eq(friends.userId, users.id))
+            .where(
+                and(
+                    eq(friends.friendId, currentUser.id),
+                    eq(friends.status, "pending")
+                )
+            );
+
+        return pendingRequests;
+    });
+
+// accept friend request
+export const acceptFriendRequest = createServerFn({ method: "POST" })
+    .inputValidator((friendId: string) => friendId)
+    .handler(async ({ data: friendId }) => {
+        const currentUser = await getUser();
+        if (!currentUser) {
+            throw new Error("User not authenticated");
+        }
+
+        await db.update(friends)
+            .set({ status: "accepted", updatedAt: new Date() })
+            .where(
+                and(
+                    eq(friends.userId, friendId),
+                    eq(friends.friendId, currentUser.id)
+                )
+            );
+
+        return { success: true };
+    });
+
+// reject friend request
+export const rejectFriendRequest = createServerFn({ method: "POST" })
+    .inputValidator((friendId: string) => friendId)
+    .handler(async ({ data: friendId }) => {
+        const currentUser = await getUser();
+        if (!currentUser) {
+            throw new Error("User not authenticated");
+        }
+
+        await db.delete(friends)
+            .where(
+                and(
+                    eq(friends.userId, friendId),
+                    eq(friends.friendId, currentUser.id)
+                )
+            );
+
+        return { success: true };
+    });
+
+// block friend request
+export const blockFriendRequest = createServerFn({ method: "POST" })
+    .inputValidator((friendId: string) => friendId)
+    .handler(async ({ data: friendId }) => {
+        const currentUser = await getUser();
+        if (!currentUser) {
+            throw new Error("User not authenticated");
+        }
+
+        await db.update(friends)
+            .set({ status: "blocked", updatedAt: new Date() })
+            .where(
+                and(
+                    eq(friends.userId, friendId),
+                    eq(friends.friendId, currentUser.id)
+                )
+            );
+
+        return { success: true };
+    });
+
