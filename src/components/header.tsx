@@ -9,8 +9,8 @@ interface HeaderProps {
 
 export function Header({ title = "Pinger!", user = null }: HeaderProps) {
   const additionalLinks = user ? [{
-    label: "Friends List",
-    href: "/friends", separator: true,
+    label: "Manage Friends List",
+    href: "/friends/add", separator: true,
     icon: <HugeiconsIcon
       icon={UserLove02FreeIcons}
       strokeWidth={2}

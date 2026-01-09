@@ -3,13 +3,13 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { getAllUsers } from '@/lib/server/functions';
+import { getAllUsers, addFriendsToList } from '@/lib/server/functions';
 import { useAuthenticate } from '@daveyplate/better-auth-ui'
 import { QueryClient } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router'
 import { useState, useMemo } from 'react';
 
-export const Route = createFileRoute('/friends/')({
+export const Route = createFileRoute('/friends/add')({
   component: RouteComponent,
   loader: async ({ context }) => {
     context.queryClient = new QueryClient();
@@ -48,6 +48,20 @@ function RouteComponent() {
     });
   };
 
+  const handleAddFriends = async () => {
+    try {
+      const friendIds = Array.from(selectedUserIds);
+
+      const result = await addFriendsToList({ data: friendIds });
+      if (result.success) {
+        console.log(`Successfully sent ${result.count} friend requests`);
+        setSelectedUserIds(new Set());
+      }
+    } catch (error) {
+      console.error('Error adding friends:', error);
+    }
+  };
+
   return (
     <div className="items-center justify-center flex flex-col p-4 container mx-auto gap-4">
       <h1 className='text-2xl font-bold'>Add Friends</h1>
@@ -61,7 +75,15 @@ function RouteComponent() {
       {selectedUsers.length > 0 && (
         <>
           <div className='w-full'>
-            <h2 className='text-lg font-semibold mb-3'>Selected users ({selectedUsers.length})</h2>
+            <div className='flex justify-between items-center mb-3'>
+              <h2 className='text-lg font-semibold'>Selected users ({selectedUsers.length})</h2>
+              <button
+                onClick={handleAddFriends}
+                className='bg-green-600 hover:bg-green-700 border border-green-600 p-2 rounded text-sm font-medium text-white transition-colors'
+              >
+                Send Friend Requests
+              </button>
+            </div>
             <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 grid-rows-auto gap-4">
               {selectedUsers.map((user) => <UserCard key={user.id} user={user} isSelected={true} onToggle={() => toggleUserSelection(user.id)} />)}
             </div>

@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as PingerIndexRouteImport } from './routes/pinger/index'
 import { Route as PingIndexRouteImport } from './routes/ping/index'
 import { Route as FriendsIndexRouteImport } from './routes/friends/index'
+import { Route as FriendsAddRouteImport } from './routes/friends/add'
 import { Route as AuthPathRouteImport } from './routes/auth/$path'
 import { Route as ApiPushSubscribeRouteImport } from './routes/api/push/subscribe'
 import { Route as ApiPushSendToUsersRouteImport } from './routes/api/push/send-to-users'
@@ -36,6 +37,11 @@ const PingIndexRoute = PingIndexRouteImport.update({
 const FriendsIndexRoute = FriendsIndexRouteImport.update({
   id: '/friends/',
   path: '/friends/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FriendsAddRoute = FriendsAddRouteImport.update({
+  id: '/friends/add',
+  path: '/friends/add',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthPathRoute = AuthPathRouteImport.update({
@@ -62,6 +68,7 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth/$path': typeof AuthPathRoute
+  '/friends/add': typeof FriendsAddRoute
   '/friends': typeof FriendsIndexRoute
   '/ping': typeof PingIndexRoute
   '/pinger': typeof PingerIndexRoute
@@ -72,6 +79,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth/$path': typeof AuthPathRoute
+  '/friends/add': typeof FriendsAddRoute
   '/friends': typeof FriendsIndexRoute
   '/ping': typeof PingIndexRoute
   '/pinger': typeof PingerIndexRoute
@@ -83,6 +91,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/auth/$path': typeof AuthPathRoute
+  '/friends/add': typeof FriendsAddRoute
   '/friends/': typeof FriendsIndexRoute
   '/ping/': typeof PingIndexRoute
   '/pinger/': typeof PingerIndexRoute
@@ -95,6 +104,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth/$path'
+    | '/friends/add'
     | '/friends'
     | '/ping'
     | '/pinger'
@@ -105,6 +115,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth/$path'
+    | '/friends/add'
     | '/friends'
     | '/ping'
     | '/pinger'
@@ -115,6 +126,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/auth/$path'
+    | '/friends/add'
     | '/friends/'
     | '/ping/'
     | '/pinger/'
@@ -126,6 +138,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthPathRoute: typeof AuthPathRoute
+  FriendsAddRoute: typeof FriendsAddRoute
   FriendsIndexRoute: typeof FriendsIndexRoute
   PingIndexRoute: typeof PingIndexRoute
   PingerIndexRoute: typeof PingerIndexRoute
@@ -164,6 +177,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FriendsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/friends/add': {
+      id: '/friends/add'
+      path: '/friends/add'
+      fullPath: '/friends/add'
+      preLoaderRoute: typeof FriendsAddRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth/$path': {
       id: '/auth/$path'
       path: '/auth/$path'
@@ -198,6 +218,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthPathRoute: AuthPathRoute,
+  FriendsAddRoute: FriendsAddRoute,
   FriendsIndexRoute: FriendsIndexRoute,
   PingIndexRoute: PingIndexRoute,
   PingerIndexRoute: PingerIndexRoute,
