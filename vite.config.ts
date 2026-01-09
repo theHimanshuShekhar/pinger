@@ -12,6 +12,18 @@ const config = defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       strategies: 'injectManifest',
+      manifest: {
+        name: 'Pinger - Real-time Push Notifications',
+        short_name: 'Pinger',
+        description: 'Reliable and real-time push notifications for PWA clients on Android and iOS',
+        start_url: '/',
+        scope: '/',
+        display: 'standalone',
+        orientation: 'portrait-primary',
+        theme_color: '#000000',
+        background_color: '#ffffff',
+        categories: ['productivity'],
+      },
       injectManifest: {
         globDirectory: 'dist',
         globPatterns: ['**/*.{js,wasm,css,html}'],

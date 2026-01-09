@@ -21,9 +21,10 @@
       "purpose": "any maskable"
     }
   ],
-  "start_url": ".",
+  "start_url": "/",
   "display": "standalone",
   "scope": "/",
+  "orientation": "portrait-primary",
   "theme_color": "#000000",
   "background_color": "#ffffff",
   "categories": [

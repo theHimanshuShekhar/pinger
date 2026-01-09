@@ -38,7 +38,10 @@ export const Route = createRootRouteWithContext<{
         title: "BhayanakCast",
       },
     ],
-    links: [{ rel: "stylesheet", href: appCss }],
+    links: [
+      { rel: "stylesheet", href: appCss },
+      { rel: "manifest", href: "/manifest.json" },
+    ],
   }),
   notFoundComponent: NotFound,
   shellComponent: RootComponent,
