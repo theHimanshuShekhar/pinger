@@ -137,3 +137,83 @@ export const blockFriendRequest = createServerFn({ method: "POST" })
         return { success: true };
     });
 
+// get accepted friends
+export const getAcceptedFriends = createServerFn({ method: "GET" }).handler(
+    async () => {
+        const currentUser = await getUser();
+        if (!currentUser) {
+            throw new Error("User not authenticated");
+        }
+
+        const acceptedFriends = await db
+            .select({
+                id: users.id,
+                name: users.name,
+                image: users.image,
+                email: users.email,
+            })
+            .from(friends)
+            .innerJoin(users, eq(friends.friendId, users.id))
+            .where(
+                and(
+                    eq(friends.userId, currentUser.id),
+                    eq(friends.status, "accepted")
+                )
+            );
+
+        return acceptedFriends;
+    });
+
+// get pending friend requests sent by current user
+export const getSentPendingFriendRequests = createServerFn({ method: "GET" }).handler(
+    async () => {
+        const currentUser = await getUser();
+        if (!currentUser) {
+            throw new Error("User not authenticated");
+        }
+
+        const sentPendingRequests = await db
+            .select({
+                id: users.id,
+                name: users.name,
+                image: users.image,
+                email: users.email,
+            })
+            .from(friends)
+            .innerJoin(users, eq(friends.friendId, users.id))
+            .where(
+                and(
+                    eq(friends.userId, currentUser.id),
+                    eq(friends.status, "pending")
+                )
+            );
+
+        return sentPendingRequests;
+    });
+
+// get blocked friend requests sent by current user
+export const getSentBlockedFriendRequests = createServerFn({ method: "GET" }).handler(
+    async () => {
+        const currentUser = await getUser();
+        if (!currentUser) {
+            throw new Error("User not authenticated");
+        }
+
+        const sentBlockedRequests = await db
+            .select({
+                id: users.id,
+                name: users.name,
+                image: users.image,
+                email: users.email,
+            })
+            .from(friends)
+            .innerJoin(users, eq(friends.friendId, users.id))
+            .where(
+                and(
+                    eq(friends.userId, currentUser.id),
+                    eq(friends.status, "blocked")
+                )
+            );
+
+        return sentBlockedRequests;
+    });

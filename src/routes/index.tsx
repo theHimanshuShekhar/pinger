@@ -7,6 +7,7 @@ import { getPendingFriendRequests } from "@/lib/server/functions";
 
 export const Route = createFileRoute("/")({
   component: App,
+  ssr: false,
 });
 
 function App() {
@@ -34,8 +35,8 @@ function App() {
 
   return (
     <div className="grow items-center justify-center flex flex-col gap-8">
-      <div className={`grid ${hasPendingRequests ? 'grid-cols-3' : 'grid-cols-1'} grow w-full h-full place-items-center`}>
-        <div className="flex flex-col gap-4 col-span-2 p-4 h-full w-full">
+      <div className={`grid ${hasPendingRequests ? 'md:grid-cols-3' : 'md:grid-cols-1'} grow w-full h-full place-items-center`}>
+        <div className="flex flex-col gap-4 md:col-span-2 p-4 h-full w-full">
           <button
             className="px-8 py-4 bg-green-600 hover:bg-green-700 text-white font-bold text-xl transition-colors shadow-lg rounded"
           >

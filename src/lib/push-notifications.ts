@@ -3,7 +3,16 @@
  * Handles subscribing to push notifications and managing subscriptions
  */
 
+function isBrowser(): boolean {
+    return typeof window !== 'undefined' && typeof navigator !== 'undefined';
+}
+
 export async function registerServiceWorker() {
+    if (!isBrowser()) {
+        console.warn('Not in browser environment');
+        return null;
+    }
+
     if (!('serviceWorker' in navigator)) {
         console.warn('Service Workers are not supported');
         return null;
@@ -22,6 +31,10 @@ export async function registerServiceWorker() {
 }
 
 export async function requestNotificationPermission(): Promise<NotificationPermission> {
+    if (!isBrowser()) {
+        return 'denied';
+    }
+
     if (!('Notification' in window)) {
         console.warn('Notifications are not supported');
         return 'denied';
@@ -40,6 +53,10 @@ export async function requestNotificationPermission(): Promise<NotificationPermi
 }
 
 export async function subscribeToPushNotifications(): Promise<PushSubscription | null> {
+    if (!isBrowser()) {
+        return null;
+    }
+
     try {
         const registration = await navigator.serviceWorker.ready;
         const subscription = await registration.pushManager.subscribe({
@@ -56,6 +73,10 @@ export async function subscribeToPushNotifications(): Promise<PushSubscription |
 }
 
 export async function unsubscribeFromPushNotifications(): Promise<boolean> {
+    if (!isBrowser()) {
+        return false;
+    }
+
     try {
         const registration = await navigator.serviceWorker.ready;
         const subscription = await registration.pushManager.getSubscription();
@@ -74,6 +95,10 @@ export async function unsubscribeFromPushNotifications(): Promise<boolean> {
 }
 
 export async function getPushSubscription(): Promise<PushSubscription | null> {
+    if (!isBrowser()) {
+        return null;
+    }
+
     try {
         const registration = await navigator.serviceWorker.ready;
         return await registration.pushManager.getSubscription();
@@ -111,6 +136,11 @@ export async function sendSubscriptionToServer(subscription: PushSubscription, u
 export async function initializePushNotifications(userId: string): Promise<void> {
 
     console.log('Initializing push notifications for user ID:', userId);
+
+    if (!isBrowser()) {
+        console.warn('Not in browser environment, skipping push notification initialization');
+        return;
+    }
 
     try {
         // Wait for Service Worker to be ready (VitePWA handles registration)
