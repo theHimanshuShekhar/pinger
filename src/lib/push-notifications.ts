@@ -115,7 +115,6 @@ export async function initializePushNotifications(userId: string): Promise<void>
     try {
         // Wait for Service Worker to be ready (VitePWA handles registration)
         const registration = await navigator.serviceWorker.ready;
-        console.log(registration)
 
         if (!registration) {
             console.warn('Service Worker registration not found');

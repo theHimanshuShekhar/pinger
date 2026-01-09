@@ -3,9 +3,8 @@ import appCss from '../styles.css?url'
 import { Header } from '../components/header'
 import { Toaster } from '@/components/ui/sonner'
 import { Providers } from '@/providers'
-import { QueryClient } from '@tanstack/react-query'
+import { type QueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { getUser } from '@/lib/server/functions'
-import { useEffect } from 'react'
 import { initializePushNotifications } from '@/lib/push-notifications'
 import { NotFound } from '@/components/not-found'
 
@@ -14,7 +13,6 @@ export const Route = createRootRouteWithContext<{
   user: Awaited<ReturnType<typeof getUser>>;
 }>()({
   beforeLoad: async ({ context }) => {
-    context.queryClient = new QueryClient();
     const user = await context.queryClient.fetchQuery({
       queryKey: ["user"],
       queryFn: ({ signal }) => getUser({ signal }),
@@ -50,15 +48,21 @@ export const Route = createRootRouteWithContext<{
 function RootComponent({ children }: { children: React.ReactNode }) {
   const { user } = Route.useLoaderData();
 
-  // Initialize push notifications after user is authenticated
-  useEffect(() => {
-    console.log('User ID in RootComponent:', user?.id);
-    if (user?.id) {
-      initializePushNotifications(user.id).catch((error) => {
-        console.warn('Failed to initialize push notifications:', error);
-      });
-    }
-  }, [user?.id]);
+  // Use React Query to periodically check and initialize push notifications
+  useSuspenseQuery({
+    queryKey: ['pushNotifications', user?.id],
+    queryFn: async () => {
+      if (!user?.id) {
+        throw new Error('User ID not available');
+      }
+      console.log('Checking/initializing push notifications for user:', user.id);
+      await initializePushNotifications(user.id);
+      return { success: true };
+    },
+    refetchInterval: 30000, // Check every 30 seconds
+    staleTime: 0, // Always consider the data stale to force refetch
+    retry: 1, // Retry once on failure
+  });
 
   return (
     <html lang="en">
