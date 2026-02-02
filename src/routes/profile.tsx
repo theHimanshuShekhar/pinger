@@ -21,7 +21,7 @@ function ProfilePage() {
 
     return (
         <div className="h-full w-full p-4 overflow-hidden">
-            <div className="w-full h-full flex flex-col gap-4">
+            <div className="container mx-auto h-full flex flex-col gap-4">
                 {/* Top Row: Profile Info + Top Roommates */}
                 <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 min-h-0">
                     {/* Profile Info Card */}
@@ -84,7 +84,11 @@ function ProfilePage() {
                                     <p className="text-sm text-muted-foreground">
                                         {new Date(
                                             user!.createdAt
-                                        ).toLocaleDateString()}
+                                        ).toLocaleDateString("en-US", {
+                                            year: "numeric",
+                                            month: "short",
+                                            day: "numeric"
+                                        })}
                                     </p>
                                 </div>
                             </div>
