@@ -8,7 +8,7 @@ export function Header() {
                 {/* Left side: Branding - larger touch target for mobile */}
                 <Link
                     to="/"
-                    className="flex items-center gap-2 text-lg md:text-xl font-bold tracking-tight transition-colors hover:text-primary py-2 px-1 -ml-1 rounded-lg hover:bg-accent/50"
+                    className="px-4 flex items-center gap-2 text-lg md:text-xl font-bold tracking-tight transition-colors hover:text-primary py-2 px-1 -ml-1 rounded-lg hover:bg-accent/50"
                 >
                     <span className="text-xl md:text-2xl">📡</span>
                     <span>Pinger!</span>
