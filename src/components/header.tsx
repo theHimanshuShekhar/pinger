@@ -3,23 +3,25 @@ import { Link } from "@tanstack/react-router"
 
 export function Header() {
     return (
-        <header className="sticky top-0 z-50 flex h-14 items-center justify-between border-b bg-background px-3 sm:px-4 md:px-6">
-            {/* Left side: Branding - larger touch target for mobile */}
-            <Link
-                to="/"
-                className="flex items-center gap-2 text-lg md:text-xl font-bold tracking-tight transition-colors hover:text-primary py-2 px-1 -ml-1 rounded-lg hover:bg-accent/50"
-            >
-                <span className="text-xl md:text-2xl">📡</span>
-                <span>Pinger!</span>
-            </Link>
+        <header className="sticky top-0 z-50 border-b bg-background">
+            <div className="container mx-auto flex h-14 items-center justify-between px-3 sm:px-4 md:px-6">
+                {/* Left side: Branding - larger touch target for mobile */}
+                <Link
+                    to="/"
+                    className="flex items-center gap-2 text-lg md:text-xl font-bold tracking-tight transition-colors hover:text-primary py-2 px-1 -ml-1 rounded-lg hover:bg-accent/50"
+                >
+                    <span className="text-xl md:text-2xl">📡</span>
+                    <span>Pinger!</span>
+                </Link>
 
-            {/* Right side: User button - icon on mobile, sm on desktop */}
-            <div className="flex items-center">
-                <div className="md:hidden">
-                    <UserButton size="icon" />
-                </div>
-                <div className="hidden md:block">
-                    <UserButton size="sm" />
+                {/* Right side: User button - icon on mobile, sm on desktop */}
+                <div className="flex items-center">
+                    <div className="md:hidden">
+                        <UserButton size="icon" />
+                    </div>
+                    <div className="hidden md:block">
+                        <UserButton size="sm" />
+                    </div>
                 </div>
             </div>
         </header>

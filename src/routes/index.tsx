@@ -5,11 +5,11 @@ export const Route = createFileRoute("/")({ component: IndexPage })
 
 function IndexPage() {
     return (
-        <div className="h-full w-full flex flex-col gap-2 p-2">
+        <div className="h-full w-full flex flex-col gap-2 p-2 container mx-auto">
             {/* Create Ping Button - Always 1/10th (flex-1), Mobile: order 2, Desktop: order 1 */}
             <section className="flex-1 order-2 md:order-1 min-h-0">
-                <Button 
-                    size="lg" 
+                <Button
+                    size="lg"
                     className="w-full h-full text-lg font-semibold rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.15)] border border-border hover:shadow-[0_8px_30px_rgba(0,0,0,0.2)] hover:scale-[1.02] transition-all bg-primary"
                 >
                     📡 Create Ping
