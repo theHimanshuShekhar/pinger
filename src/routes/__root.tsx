@@ -50,7 +50,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             <body className="h-screen min-w-sm overflow-hidden flex flex-col bg-background text-foreground antialiased">
                 <Providers>
                     <Header />
-                    
+
                     <main className="flex-1 w-full overflow-hidden">
                         {children}
                     </main>
