@@ -45,78 +45,110 @@
 
 :root {
     --radius: 0.625rem;
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.708 0 0);
-    --chart-1: oklch(0.646 0.222 41.116);
-    --chart-2: oklch(0.6 0.118 184.704);
-    --chart-3: oklch(0.398 0.07 227.392);
-    --chart-4: oklch(0.828 0.189 84.429);
-    --chart-5: oklch(0.769 0.188 70.08);
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.708 0 0);
+    /* Discord Light Theme - Blue Gray */
+    --background: #ffffff;
+    --foreground: #2e3338;
+    --card: #f2f3f5;
+    --card-foreground: #2e3338;
+    --popover: #ffffff;
+    --popover-foreground: #2e3338;
+    --primary: #5865f2;
+    --primary-foreground: #ffffff;
+    --secondary: #e3e5e8;
+    --secondary-foreground: #2e3338;
+    --muted: #e3e5e8;
+    --muted-foreground: #747f8d;
+    --accent: #f2f3f5;
+    --accent-foreground: #2e3338;
+    --destructive: #ed4245;
+    --border: #e3e5e8;
+    --input: #e3e5e8;
+    --ring: #5865f2;
+    --chart-1: #5865f2;
+    --chart-2: #3ba55c;
+    --chart-3: #ed4245;
+    --chart-4: #fbbf24;
+    --chart-5: #eb459e;
+    --sidebar: #f2f3f5;
+    --sidebar-foreground: #2e3338;
+    --sidebar-primary: #5865f2;
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-accent: #e3e5e8;
+    --sidebar-accent-foreground: #2e3338;
+    --sidebar-border: #e3e5e8;
+    --sidebar-ring: #5865f2;
 }
 
 .dark {
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.205 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.205 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.922 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.704 0.191 22.216);
-    --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.556 0 0);
-    --chart-1: oklch(0.488 0.243 264.376);
-    --chart-2: oklch(0.696 0.17 162.48);
-    --chart-3: oklch(0.769 0.188 70.08);
-    --chart-4: oklch(0.627 0.265 303.9);
-    --chart-5: oklch(0.645 0.246 16.439);
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.488 0.243 264.376);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(1 0 0 / 10%);
-    --sidebar-ring: oklch(0.556 0 0);
+    /* Discord Dark Theme - Blue Gray */
+    --background: #36393f;
+    --foreground: #dcddde;
+    --card: #2f3136;
+    --card-foreground: #dcddde;
+    --popover: #18191c;
+    --popover-foreground: #dcddde;
+    --primary: #5865f2;
+    --primary-foreground: #ffffff;
+    --secondary: #2f3136;
+    --secondary-foreground: #dcddde;
+    --muted: #40444b;
+    --muted-foreground: #96989d;
+    --accent: #40444b;
+    --accent-foreground: #dcddde;
+    --destructive: #ed4245;
+    --border: #40444b;
+    --input: #40444b;
+    --ring: #5865f2;
+    --chart-1: #5865f2;
+    --chart-2: #3ba55c;
+    --chart-3: #ed4245;
+    --chart-4: #fbbf24;
+    --chart-5: #eb459e;
+    --sidebar: #2f3136;
+    --sidebar-foreground: #dcddde;
+    --sidebar-primary: #5865f2;
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-accent: #40444b;
+    --sidebar-accent-foreground: #dcddde;
+    --sidebar-border: #40444b;
+    --sidebar-ring: #5865f2;
 }
 
 @layer base {
     * {
         @apply border-border outline-ring/50;
     }
+    
+    /* Mobile-first responsive typography */
+    html {
+        font-size: 14px;
+    }
+    
+    @media (min-width: 768px) {
+        html {
+            font-size: 16px;
+        }
+    }
+    
     body {
         @apply bg-background text-foreground;
+        /* Prevent horizontal scroll on mobile */
+        overflow-x: hidden;
+        /* Smooth scrolling */
+        scroll-behavior: smooth;
+        /* Better text rendering on mobile */
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    
+    /* Responsive touch targets for mobile */
+    button, a {
+        @apply min-h-[44px] min-w-[44px];
+    }
+    
+    @media (min-width: 768px) {
+        button, a {
+            @apply min-h-0 min-w-0;
+        }
     }
 }

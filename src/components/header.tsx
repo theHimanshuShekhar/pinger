@@ -1,50 +1,26 @@
-import { GitHubIcon, UserButton } from "@daveyplate/better-auth-ui"
+import { UserButton } from "@daveyplate/better-auth-ui"
 import { Link } from "@tanstack/react-router"
-import { ModeToggle } from "./mode-toggle"
-import { Button } from "./ui/button"
 
 export function Header() {
     return (
-        <header className="sticky top-0 z-50 flex h-12 justify-between border-b bg-background/60 px-safe-or-4 backdrop-blur md:h-14 md:px-safe-or-6">
-            <Link to="/" className="flex items-center gap-2">
-                <svg
-                    aria-label="Better-Auth Logo"
-                    className="size-5"
-                    fill="none"
-                    height="45"
-                    viewBox="0 0 60 45"
-                    width="60"
-                    xmlns="http://www.w3.org/2000/svg"
-                >
-                    <title>Better Auth UI Logo</title>
-                    <path
-                        className="fill-black dark:fill-white"
-                        clipRule="evenodd"
-                        d="M0 0H15V45H0V0ZM45 0H60V45H45V0ZM20 0H40V15H20V0ZM20 30H40V45H20V30Z"
-                        fillRule="evenodd"
-                    />
-                </svg>
-                BETTER-AUTH. STARTER
+        <header className="sticky top-0 z-50 flex h-14 items-center justify-between border-b bg-background px-3 sm:px-4 md:px-6">
+            {/* Left side: Branding - larger touch target for mobile */}
+            <Link
+                to="/"
+                className="flex items-center gap-2 text-lg md:text-xl font-bold tracking-tight transition-colors hover:text-primary py-2 px-1 -ml-1 rounded-lg hover:bg-accent/50"
+            >
+                <span className="text-xl md:text-2xl">📡</span>
+                <span>Pinger!</span>
             </Link>
 
-            <div className="flex items-center gap-2">
-                <a
-                    href="https://github.com/daveyplate/better-auth-nextjs-starter"
-                    target="_blank"
-                    rel="noopener"
-                >
-                    <Button
-                        variant="outline"
-                        size="icon"
-                        className="size-8 rounded-full"
-                    >
-                        <GitHubIcon />
-                    </Button>
-                </a>
-
-                <ModeToggle />
-
-                <UserButton size="icon" />
+            {/* Right side: User button - icon on mobile, sm on desktop */}
+            <div className="flex items-center">
+                <div className="md:hidden">
+                    <UserButton size="icon" />
+                </div>
+                <div className="hidden md:block">
+                    <UserButton size="sm" />
+                </div>
             </div>
         </header>
     )
