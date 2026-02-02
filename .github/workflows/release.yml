@@ -9,6 +9,7 @@ permissions:
   contents: write
   packages: write
 
+# Prevent race conditions (only one release at a time)
 concurrency:
   group: release-main
   cancel-in-progress: false
@@ -18,45 +19,61 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      # Checkout full history + tags
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
+      # Node required for semantic-release
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Install semantic-release deps
+      # Install semantic-release dependencies
+      - name: Install dependencies
         run: npm install
 
+      # Run semantic-release (creates tag + GitHub release)
       - name: Run semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npx semantic-release
 
+      # Get the newly created tag
       - name: Get latest tag
         id: tag
         run: |
           tag=$(git describe --tags --abbrev=0)
           echo "tag=$tag" >> $GITHUB_OUTPUT
 
+      # Normalize image name to lowercase (Docker requirement)
+      - name: Normalize image name
+        id: image
+        run: |
+          IMAGE="ghcr.io/${{ github.repository }}"
+          IMAGE_LOWER=$(echo "$IMAGE" | tr '[:upper:]' '[:lower:]')
+          echo "image=$IMAGE_LOWER" >> $GITHUB_OUTPUT
+
+      # Docker setup
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Login to GHCR
+      # Login to GHCR
+      - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # Build and push Docker image
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}:${{ steps.tag.outputs.tag }}
-            ghcr.io/${{ github.repository }}:latest
+            ${{ steps.image.outputs.image }}:${{ steps.tag.outputs.tag }}
+            ${{ steps.image.outputs.image }}:latest

@@ -57,6 +57,10 @@
         "vite-plugin-pwa": "^1.2.0",
         "vitest": "^4.0.15",
         "web-vitals": "^5.1.0",
-        "workbox-window": "^7.4.0"
+        "workbox-window": "^7.4.0",
+        "semantic-release": "^23.0.0",
+        "@semantic-release/commit-analyzer": "^11.0.0",
+        "@semantic-release/release-notes-generator": "^12.0.0",
+        "@semantic-release/github": "^10.0.0"
     }
 }
