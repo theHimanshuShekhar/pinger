@@ -5,8 +5,8 @@ import { tanstackStart } from "@tanstack/react-start/plugin/vite"
 import viteReact from "@vitejs/plugin-react"
 import { defineConfig } from "vite"
 import devtoolsJson from "vite-plugin-devtools-json"
-import viteTsConfigPaths from "vite-tsconfig-paths"
 import { VitePWA } from "vite-plugin-pwa"
+import viteTsConfigPaths from "vite-tsconfig-paths"
 
 const config = defineConfig({
     plugins: [
@@ -29,7 +29,8 @@ const config = defineConfig({
                 // Add runtime caching for API routes and pages
                 runtimeCaching: [
                     {
-                        urlPattern: ({ request }) => request.destination === "document",
+                        urlPattern: ({ request }) =>
+                            request.destination === "document",
                         handler: "NetworkFirst",
                         options: {
                             cacheName: "pages",
@@ -40,8 +41,8 @@ const config = defineConfig({
                         }
                     },
                     {
-                        urlPattern: ({ request }) => 
-                            request.destination === "script" || 
+                        urlPattern: ({ request }) =>
+                            request.destination === "script" ||
                             request.destination === "style",
                         handler: "StaleWhileRevalidate",
                         options: {
@@ -53,7 +54,8 @@ const config = defineConfig({
                         }
                     },
                     {
-                        urlPattern: ({ request }) => request.destination === "image",
+                        urlPattern: ({ request }) =>
+                            request.destination === "image",
                         handler: "CacheFirst",
                         options: {
                             cacheName: "images",
@@ -76,12 +78,12 @@ const config = defineConfig({
                 start_url: "/",
                 icons: [
                     {
-                        src: "/icon-192x192.png",
+                        src: "/logo192.png",
                         sizes: "192x192",
                         type: "image/png"
                     },
                     {
-                        src: "/icon-512x512.png",
+                        src: "/logo512.png",
                         sizes: "512x512",
                         type: "image/png",
                         purpose: "any maskable"

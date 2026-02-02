@@ -1,8 +1,8 @@
-import { QueryClient } from "@tanstack/react-query"
+import type { QueryClient } from "@tanstack/react-query"
 import {
     createRootRouteWithContext,
     HeadContent,
-    Scripts,
+    Scripts
 } from "@tanstack/react-router"
 import type { User } from "better-auth"
 import { Header } from "@/components/header"
@@ -32,6 +32,10 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
             {
                 rel: "stylesheet",
                 href: appCss
+            },
+            {
+                rel: "manifest",
+                href: "/manifest.json"
             }
         ]
     }),
@@ -51,7 +55,6 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 })
 
 function RootDocument({ children }: { children: React.ReactNode }) {
-
     return (
         <html lang="en" suppressHydrationWarning>
             <head>
