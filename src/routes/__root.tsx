@@ -1,11 +1,20 @@
-import { TanStackDevtools } from "@tanstack/react-devtools"
-import { createRootRoute, HeadContent, Scripts } from "@tanstack/react-router"
-import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools"
+import { QueryClient } from "@tanstack/react-query"
+import {
+    createRootRouteWithContext,
+    HeadContent,
+    Scripts,
+} from "@tanstack/react-router"
+import type { User } from "better-auth"
 import { Header } from "@/components/header"
 import { Providers } from "@/components/providers"
 import appCss from "../styles/styles.css?url"
 
-export const Route = createRootRoute({
+interface MyRouterContext {
+    queryClient: QueryClient
+    user: User | null
+}
+
+export const Route = createRootRouteWithContext<MyRouterContext>()({
     head: () => ({
         meta: [
             { title: "Pinger" },
@@ -30,44 +39,32 @@ export const Route = createRootRoute({
     notFoundComponent: () => (
         <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
             <h1 className="text-4xl font-bold">404 - Not Found</h1>
-            <p className="text-gray-600">The page you're looking for doesn't exist.</p>
+            <p className="text-gray-600">
+                The page you're looking for doesn't exist.
+            </p>
             <a href="/" className="text-blue-600 hover:underline">
                 Go back home
             </a>
         </div>
     ),
-
     shellComponent: RootDocument
 })
 
 function RootDocument({ children }: { children: React.ReactNode }) {
+
     return (
         <html lang="en" suppressHydrationWarning>
             <head>
                 <HeadContent />
             </head>
 
-            <body className="h-screen min-w-sm overflow-hidden flex flex-col bg-background text-foreground antialiased">
+            <body className="h-screen min-h-[600px] min-w-sm overflow-hidden flex flex-col bg-background text-foreground antialiased">
                 <Providers>
                     <Header />
-
                     <main className="flex-1 w-full overflow-hidden">
                         {children}
                     </main>
                 </Providers>
-
-                <TanStackDevtools
-                    config={{
-                        position: "bottom-right"
-                    }}
-                    plugins={[
-                        {
-                            name: "Tanstack Router",
-                            render: <TanStackRouterDevtoolsPanel />
-                        }
-                    ]}
-                />
-
                 <Scripts />
             </body>
         </html>

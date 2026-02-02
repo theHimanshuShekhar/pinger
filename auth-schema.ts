@@ -1,4 +1,10 @@
-import { boolean, pgTable, text, timestamp } from "drizzle-orm/pg-core"
+import { boolean, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core"
+
+export const friendshipStatusEnum = pgEnum("friendship_status", [
+    "pending",
+    "accepted",
+    "blocked"
+])
 
 export const users = pgTable("users", {
     id: text("id").primaryKey(),
@@ -8,6 +14,19 @@ export const users = pgTable("users", {
     image: text("image"),
     createdAt: timestamp("created_at").notNull(),
     updatedAt: timestamp("updated_at").notNull()
+})
+
+export const friendships = pgTable("friendships", {
+    id: text("id").primaryKey(),
+    senderId: text("sender_id")
+        .notNull()
+        .references(() => users.id, { onDelete: "cascade" }),
+    receiverId: text("receiver_id")
+        .notNull()
+        .references(() => users.id, { onDelete: "cascade" }),
+    status: friendshipStatusEnum("status").notNull().default("pending"),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow()
 })
 
 export const sessions = pgTable("sessions", {

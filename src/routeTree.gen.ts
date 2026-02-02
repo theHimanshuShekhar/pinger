@@ -9,11 +9,18 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthPathRouteImport } from './routes/auth/$path'
 import { Route as AccountPathRouteImport } from './routes/account/$path'
+import { Route as ApiAuthIndexRouteImport } from './routes/api/auth/index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -29,6 +36,11 @@ const AccountPathRoute = AccountPathRouteImport.update({
   path: '/account/$path',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAuthIndexRoute = ApiAuthIndexRouteImport.update({
+  id: '/api/auth/',
+  path: '/api/auth/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -37,40 +49,74 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/profile': typeof ProfileRoute
   '/account/$path': typeof AccountPathRoute
   '/auth/$path': typeof AuthPathRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/auth': typeof ApiAuthIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/profile': typeof ProfileRoute
   '/account/$path': typeof AccountPathRoute
   '/auth/$path': typeof AuthPathRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/auth': typeof ApiAuthIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/profile': typeof ProfileRoute
   '/account/$path': typeof AccountPathRoute
   '/auth/$path': typeof AuthPathRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/auth/': typeof ApiAuthIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/account/$path' | '/auth/$path' | '/api/auth/$'
+  fullPaths:
+    | '/'
+    | '/profile'
+    | '/account/$path'
+    | '/auth/$path'
+    | '/api/auth/$'
+    | '/api/auth'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/account/$path' | '/auth/$path' | '/api/auth/$'
-  id: '__root__' | '/' | '/account/$path' | '/auth/$path' | '/api/auth/$'
+  to:
+    | '/'
+    | '/profile'
+    | '/account/$path'
+    | '/auth/$path'
+    | '/api/auth/$'
+    | '/api/auth'
+  id:
+    | '__root__'
+    | '/'
+    | '/profile'
+    | '/account/$path'
+    | '/auth/$path'
+    | '/api/auth/$'
+    | '/api/auth/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ProfileRoute: typeof ProfileRoute
   AccountPathRoute: typeof AccountPathRoute
   AuthPathRoute: typeof AuthPathRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiAuthIndexRoute: typeof ApiAuthIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -92,6 +138,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountPathRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/auth/': {
+      id: '/api/auth/'
+      path: '/api/auth'
+      fullPath: '/api/auth'
+      preLoaderRoute: typeof ApiAuthIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -104,9 +157,11 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ProfileRoute: ProfileRoute,
   AccountPathRoute: AccountPathRoute,
   AuthPathRoute: AuthPathRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiAuthIndexRoute: ApiAuthIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
