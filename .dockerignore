@@ -15,6 +15,16 @@ docker-compose.yml
 .output
 build
 dist
+dev-dist
+coverage
+.nyc_output
+*.log
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+.github
 
 # allow dependency files
 !package.json
