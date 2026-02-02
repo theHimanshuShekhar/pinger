@@ -15,3 +15,7 @@ docker-compose.yml
 .output
 build
 dist
+
+# allow dependency files
+!package.json
+!pnpm-lock.yaml
