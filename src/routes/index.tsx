@@ -80,26 +80,18 @@ function IndexPage() {
             <div className="container mx-auto hidden md:flex flex-[9] flex-row gap-4 md:order-3 min-h-0">
                 {/* Current Friends - Half of 4.5/10ths */}
                 <section className="flex-1 bg-background rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.15)] border border-border p-6 flex flex-col min-h-0">
-                    <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-3">
-                            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                                <Users className="h-5 w-5 text-primary" />
-                            </div>
-                            <div>
-                                <h2 className="text-xl font-semibold">
-                                    Current Friends
-                                </h2>
-                                <p className="text-sm text-muted-foreground">
-                                    Your connections
-                                </p>
-                            </div>
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                            <Users className="h-5 w-5 text-primary" />
                         </div>
-                        <Link to="/users">
-                            <Button size="sm" variant="outline">
-                                <UserPlus className="h-4 w-4 mr-2" />
-                                Add Friends
-                            </Button>
-                        </Link>
+                        <div>
+                            <h2 className="text-xl font-semibold">
+                                Current Friends
+                            </h2>
+                            <p className="text-sm text-muted-foreground">
+                                Your connections
+                            </p>
+                        </div>
                     </div>
                     <div className="flex-1 bg-muted rounded-lg overflow-auto">
                         <div className="flex flex-col items-center justify-center h-full py-8 text-center">
@@ -118,18 +110,26 @@ function IndexPage() {
 
                 {/* Friend Requests - Half of 4.5/10ths */}
                 <section className="flex-1 bg-background rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.15)] border border-border p-6 flex flex-col min-h-0">
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                            <UserPlus className="h-5 w-5 text-primary" />
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-3">
+                            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                                <UserPlus className="h-5 w-5 text-primary" />
+                            </div>
+                            <div>
+                                <h2 className="text-xl font-semibold">
+                                    Friend Requests
+                                </h2>
+                                <p className="text-sm text-muted-foreground">
+                                    Pending invitations
+                                </p>
+                            </div>
                         </div>
-                        <div>
-                            <h2 className="text-xl font-semibold">
-                                Friend Requests
-                            </h2>
-                            <p className="text-sm text-muted-foreground">
-                                Pending invitations
-                            </p>
-                        </div>
+                        <Link to="/users">
+                            <Button size="sm" variant="outline">
+                                <UserPlus className="h-4 w-4 mr-2" />
+                                Add Friends
+                            </Button>
+                        </Link>
                     </div>
                     <div className="flex-1 bg-muted rounded-lg overflow-auto">
                         <div className="flex flex-col items-center justify-center h-full py-8 text-center">

@@ -1,6 +1,8 @@
 import { UserButton } from "@daveyplate/better-auth-ui"
 import { Link } from "@tanstack/react-router"
 
+import { UserCounter } from "./user-counter"
+
 export function Header() {
     return (
         <header className="sticky top-0 z-50 border-b bg-background">
@@ -12,6 +14,7 @@ export function Header() {
                 >
                     <span className="text-xl md:text-2xl">📡</span>
                     <span>Pinger!</span>
+                    <UserCounter />
                 </Link>
 
                 {/* Right side: User button - icon on mobile, sm on desktop */}
