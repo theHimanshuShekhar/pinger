@@ -1,6 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { createFileRoute, Link } from "@tanstack/react-router"
-import { Activity, Check, Radio, UserPlus, Users, X } from "lucide-react"
+import {
+    Activity,
+    Check,
+    Clock,
+    Gamepad2,
+    Radio,
+    UserPlus,
+    Users,
+    X
+} from "lucide-react"
 import { useState } from "react"
 import { FriendItem } from "@/components/friend-item"
 import { Button } from "@/components/ui/button"
@@ -9,18 +18,21 @@ import {
     getPendingFriendRequests,
     respondToFriendRequest
 } from "@/lib/server/friendships"
+import { getActivePings } from "@/lib/server/pings"
 
 const PENDING_REQUESTS_QUERY_KEY = "pending-requests"
 const FRIENDS_QUERY_KEY = "friends"
+const PINGS_QUERY_KEY = "pings"
 
 export const Route = createFileRoute("/")({
     component: IndexPage,
     loader: async () => {
-        const [pendingRequests, friends] = await Promise.all([
+        const [pendingRequests, friends, pings] = await Promise.all([
             getPendingFriendRequests(),
-            getFriends()
+            getFriends(),
+            getActivePings()
         ])
-        return { pendingRequests, friends }
+        return { pendingRequests, friends, pings }
     }
 })
 
@@ -99,11 +111,25 @@ function FriendRequestItem({
     )
 }
 
+function formatDateTime(dateStr: string | Date | null) {
+    if (!dateStr) return null
+    const date = new Date(dateStr)
+    return date.toLocaleString("en-US", {
+        month: "short",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit"
+    })
+}
+
 function IndexPage() {
     const loaderData = Route.useLoaderData()
 
-    const { pendingRequests: initialPending, friends: initialFriends } =
-        loaderData
+    const {
+        pendingRequests: initialPending,
+        friends: initialFriends,
+        pings: initialPings
+    } = loaderData
 
     const { data: pendingRequests = [] } = useQuery({
         queryKey: [PENDING_REQUESTS_QUERY_KEY],
@@ -119,21 +145,34 @@ function IndexPage() {
         staleTime: 1000 * 30
     })
 
+    const { data: pingsData } = useQuery({
+        queryKey: [PINGS_QUERY_KEY],
+        queryFn: getActivePings,
+        initialData: initialPings,
+        staleTime: 1000 * 30
+    })
+
+    const createdPings = pingsData?.created || []
+    const invitedPings = pingsData?.invited || []
+    const totalActivePings = createdPings.length + invitedPings.length
+
     return (
         <div className="h-full w-full p-2 sm:p-3 overflow-hidden">
             <div className="container mx-auto h-full flex flex-col gap-2 sm:gap-3">
                 {/* Create Ping Button */}
                 <section className="flex-none">
-                    <Button
-                        size="lg"
-                        className="w-full h-12 sm:h-14 text-sm sm:text-base font-semibold rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.15)] border border-border hover:shadow-[0_8px_30px_rgba(0,0,0,0.2)] hover:scale-[1.02] transition-all bg-primary"
-                    >
-                        <Radio className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
-                        Create Ping
-                    </Button>
+                    <Link to="/ping/create">
+                        <Button
+                            size="lg"
+                            className="w-full h-12 sm:h-14 text-sm sm:text-base font-semibold rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.15)] border border-border hover:shadow-[0_8px_30px_rgba(0,0,0,0.2)] hover:scale-[1.02] transition-all bg-primary"
+                        >
+                            <Radio className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                            Create Ping
+                        </Button>
+                    </Link>
                 </section>
 
-                {/* Current Pings - very compact when empty */}
+                {/* Current Pings */}
                 <section className="flex-none bg-muted rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.15)] border-2 border-border p-3 sm:p-4">
                     <div className="flex items-center gap-2 sm:gap-3">
                         <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
@@ -144,10 +183,232 @@ function IndexPage() {
                                 Current Pings
                             </h2>
                             <p className="text-xs text-muted-foreground">
-                                No active conversations
+                                {totalActivePings === 0
+                                    ? "No active conversations"
+                                    : `${totalActivePings} active ping${totalActivePings !== 1 ? "s" : ""}`}
                             </p>
                         </div>
                     </div>
+
+                    {totalActivePings > 0 && (
+                        <div className="mt-2 bg-background rounded-lg border border-border overflow-y-auto max-h-[200px] scrollbar-hide">
+                            <div className="p-2 space-y-2">
+                                {/* Created Pings */}
+                                {createdPings.map((ping: any) => (
+                                    <div
+                                        key={ping.id}
+                                        className="p-2 rounded-lg border border-border bg-green-50/50 dark:bg-green-900/20"
+                                    >
+                                        <div className="flex items-start gap-2">
+                                            <Gamepad2 className="h-4 w-4 text-primary mt-0.5" />
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-sm font-medium truncate">
+                                                    {ping.game ||
+                                                        "General Hangout"}
+                                                </p>
+                                                {ping.message && (
+                                                    <p className="text-xs text-muted-foreground truncate">
+                                                        {ping.message}
+                                                    </p>
+                                                )}
+                                                <div className="flex items-center gap-2 mt-1">
+                                                    <Clock className="h-3 w-3 text-muted-foreground" />
+                                                    <span className="text-xs text-muted-foreground">
+                                                        {ping.scheduledEndAt
+                                                            ? `${formatDateTime(ping.scheduledAt)} - ${formatDateTime(ping.scheduledEndAt)}`
+                                                            : formatDateTime(
+                                                                  ping.scheduledAt
+                                                              ) || "Now"}
+                                                    </span>
+                                                </div>
+                                                {/* Participants */}
+                                                <div className="mt-2">
+                                                    <div className="flex items-center gap-1 flex-wrap">
+                                                        {ping.participants?.map(
+                                                            (
+                                                                participant: any
+                                                            ) => (
+                                                                <div
+                                                                    key={
+                                                                        participant
+                                                                            .user
+                                                                            .id
+                                                                    }
+                                                                    className="relative"
+                                                                    title={`${participant.user.name} - ${participant.status}`}
+                                                                >
+                                                                    <div
+                                                                        className={`h-6 w-6 rounded-full flex items-center justify-center border-2 ${participant.status === "accepted" ? "border-green-500" : "border-yellow-500"}`}
+                                                                    >
+                                                                        {participant
+                                                                            .user
+                                                                            .image ? (
+                                                                            <img
+                                                                                src={
+                                                                                    participant
+                                                                                        .user
+                                                                                        .image
+                                                                                }
+                                                                                alt={
+                                                                                    participant
+                                                                                        .user
+                                                                                        .name
+                                                                                }
+                                                                                className="h-full w-full rounded-full object-cover"
+                                                                            />
+                                                                        ) : (
+                                                                            <Users className="h-3 w-3 text-muted-foreground" />
+                                                                        )}
+                                                                    </div>
+                                                                    {participant.isCreator && (
+                                                                        <span className="absolute -top-1 -right-1 h-2 w-2 bg-primary rounded-full" />
+                                                                    )}
+                                                                </div>
+                                                            )
+                                                        )}
+                                                    </div>
+                                                    <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
+                                                        <span className="text-green-600">
+                                                            {
+                                                                ping.participants?.filter(
+                                                                    (p: any) =>
+                                                                        p.status ===
+                                                                        "accepted"
+                                                                ).length
+                                                            }{" "}
+                                                            accepted
+                                                        </span>
+                                                        <span>•</span>
+                                                        <span className="text-yellow-600">
+                                                            {
+                                                                ping.participants?.filter(
+                                                                    (p: any) =>
+                                                                        p.status ===
+                                                                        "pending"
+                                                                ).length
+                                                            }{" "}
+                                                            pending
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <span
+                                                className={`text-xs px-2 py-0.5 rounded-full ${ping.status === "active" ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}`}
+                                            >
+                                                {ping.status}
+                                            </span>
+                                        </div>
+                                    </div>
+                                ))}
+
+                                {/* Invited Pings */}
+                                {invitedPings.map((ping: any) => (
+                                    <div
+                                        key={ping.id}
+                                        className="p-2 rounded-lg border border-border bg-blue-50/50 dark:bg-blue-900/20"
+                                    >
+                                        <div className="flex items-start gap-2">
+                                            <Gamepad2 className="h-4 w-4 text-primary mt-0.5" />
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-sm font-medium truncate">
+                                                    {ping.game ||
+                                                        "General Hangout"}
+                                                </p>
+                                                {ping.message && (
+                                                    <p className="text-xs text-muted-foreground truncate">
+                                                        {ping.message}
+                                                    </p>
+                                                )}
+                                                <div className="flex items-center gap-2 mt-1">
+                                                    <Clock className="h-3 w-3 text-muted-foreground" />
+                                                    <span className="text-xs text-muted-foreground">
+                                                        {ping.scheduledEndAt
+                                                            ? `${formatDateTime(ping.scheduledAt)} - ${formatDateTime(ping.scheduledEndAt)}`
+                                                            : formatDateTime(
+                                                                  ping.scheduledAt
+                                                              ) || "Now"}
+                                                    </span>
+                                                </div>
+                                                {/* Participants */}
+                                                <div className="mt-2">
+                                                    <div className="flex items-center gap-1 flex-wrap">
+                                                        {ping.participants?.map(
+                                                            (
+                                                                participant: any
+                                                            ) => (
+                                                                <div
+                                                                    key={
+                                                                        participant
+                                                                            .user
+                                                                            .id
+                                                                    }
+                                                                    className="relative"
+                                                                    title={`${participant.user.name} - ${participant.status}`}
+                                                                >
+                                                                    <div
+                                                                        className={`h-6 w-6 rounded-full flex items-center justify-center border-2 ${participant.status === "accepted" ? "border-green-500" : "border-yellow-500"}`}
+                                                                    >
+                                                                        {participant
+                                                                            .user
+                                                                            .image ? (
+                                                                            <img
+                                                                                src={
+                                                                                    participant
+                                                                                        .user
+                                                                                        .image
+                                                                                }
+                                                                                alt={
+                                                                                    participant
+                                                                                        .user
+                                                                                        .name
+                                                                                }
+                                                                                className="h-full w-full rounded-full object-cover"
+                                                                            />
+                                                                        ) : (
+                                                                            <Users className="h-3 w-3 text-muted-foreground" />
+                                                                        )}
+                                                                    </div>
+                                                                    {participant.isCreator && (
+                                                                        <span className="absolute -top-1 -right-1 h-2 w-2 bg-primary rounded-full" />
+                                                                    )}
+                                                                </div>
+                                                            )
+                                                        )}
+                                                    </div>
+                                                    <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
+                                                        <span className="text-green-600">
+                                                            {
+                                                                ping.participants?.filter(
+                                                                    (p: any) =>
+                                                                        p.status ===
+                                                                        "accepted"
+                                                                ).length
+                                                            }{" "}
+                                                            accepted
+                                                        </span>
+                                                        <span>•</span>
+                                                        <span className="text-yellow-600">
+                                                            {
+                                                                ping.participants?.filter(
+                                                                    (p: any) =>
+                                                                        p.status ===
+                                                                        "pending"
+                                                                ).length
+                                                            }{" "}
+                                                            pending
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700">
+                                                invited
+                                            </span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </section>
 
                 {/* Friend Requests and Current Friends - side by side on md+ */}

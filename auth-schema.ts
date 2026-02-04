@@ -1,3 +1,4 @@
+import { relations } from "drizzle-orm"
 import { boolean, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core"
 
 export const friendshipStatusEnum = pgEnum("friendship_status", [
@@ -15,6 +16,11 @@ export const users = pgTable("users", {
     createdAt: timestamp("created_at").notNull(),
     updatedAt: timestamp("updated_at").notNull()
 })
+
+export const usersRelations = relations(users, ({ many }) => ({
+    pings: many(pings),
+    pingInvites: many(pingInvites)
+}))
 
 export const friendships = pgTable("friendships", {
     id: text("id").primaryKey(),
@@ -68,3 +74,65 @@ export const verifications = pgTable("verifications", {
     createdAt: timestamp("created_at"),
     updatedAt: timestamp("updated_at")
 })
+
+// Ping feature enums
+export const pingStatusEnum = pgEnum("ping_status", [
+    "pending",
+    "active",
+    "completed",
+    "expired"
+])
+
+export const inviteStatusEnum = pgEnum("invite_status", [
+    "pending",
+    "accepted",
+    "declined"
+])
+
+// Ping feature tables
+export const pings = pgTable("pings", {
+    id: text("id").primaryKey(),
+    creatorId: text("creator_id")
+        .notNull()
+        .references(() => users.id, { onDelete: "cascade" }),
+    message: text("message"),
+    game: text("game"),
+    scheduledAt: timestamp("scheduled_at"),
+    scheduledEndAt: timestamp("scheduled_end_at"),
+    status: pingStatusEnum("status").notNull().default("pending"),
+    lastActivityAt: timestamp("last_activity_at").notNull().defaultNow(),
+    expiresAt: timestamp("expires_at").notNull(),
+    createdAt: timestamp("created_at").notNull().defaultNow()
+})
+
+export const pingInvites = pgTable("ping_invites", {
+    id: text("id").primaryKey(),
+    pingId: text("ping_id")
+        .notNull()
+        .references(() => pings.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+        .notNull()
+        .references(() => users.id, { onDelete: "cascade" }),
+    status: inviteStatusEnum("status").notNull().default("pending"),
+    respondedAt: timestamp("responded_at")
+})
+
+// Relations
+export const pingsRelations = relations(pings, ({ one, many }) => ({
+    creator: one(users, {
+        fields: [pings.creatorId],
+        references: [users.id]
+    }),
+    invites: many(pingInvites)
+}))
+
+export const pingInvitesRelations = relations(pingInvites, ({ one }) => ({
+    ping: one(pings, {
+        fields: [pingInvites.pingId],
+        references: [pings.id]
+    }),
+    user: one(users, {
+        fields: [pingInvites.userId],
+        references: [users.id]
+    })
+}))
