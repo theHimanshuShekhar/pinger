@@ -13,6 +13,7 @@ import { Route as UsersRouteImport } from './routes/users'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PingCreateRouteImport } from './routes/ping/create'
+import { Route as PingPingIdRouteImport } from './routes/ping/$pingId'
 import { Route as AuthPathRouteImport } from './routes/auth/$path'
 import { Route as AccountPathRouteImport } from './routes/account/$path'
 import { Route as ApiAuthIndexRouteImport } from './routes/api/auth/index'
@@ -36,6 +37,11 @@ const IndexRoute = IndexRouteImport.update({
 const PingCreateRoute = PingCreateRouteImport.update({
   id: '/ping/create',
   path: '/ping/create',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PingPingIdRoute = PingPingIdRouteImport.update({
+  id: '/ping/$pingId',
+  path: '/ping/$pingId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthPathRoute = AuthPathRouteImport.update({
@@ -65,6 +71,7 @@ export interface FileRoutesByFullPath {
   '/users': typeof UsersRoute
   '/account/$path': typeof AccountPathRoute
   '/auth/$path': typeof AuthPathRoute
+  '/ping/$pingId': typeof PingPingIdRoute
   '/ping/create': typeof PingCreateRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/auth': typeof ApiAuthIndexRoute
@@ -75,6 +82,7 @@ export interface FileRoutesByTo {
   '/users': typeof UsersRoute
   '/account/$path': typeof AccountPathRoute
   '/auth/$path': typeof AuthPathRoute
+  '/ping/$pingId': typeof PingPingIdRoute
   '/ping/create': typeof PingCreateRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/auth': typeof ApiAuthIndexRoute
@@ -86,6 +94,7 @@ export interface FileRoutesById {
   '/users': typeof UsersRoute
   '/account/$path': typeof AccountPathRoute
   '/auth/$path': typeof AuthPathRoute
+  '/ping/$pingId': typeof PingPingIdRoute
   '/ping/create': typeof PingCreateRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/auth/': typeof ApiAuthIndexRoute
@@ -98,6 +107,7 @@ export interface FileRouteTypes {
     | '/users'
     | '/account/$path'
     | '/auth/$path'
+    | '/ping/$pingId'
     | '/ping/create'
     | '/api/auth/$'
     | '/api/auth'
@@ -108,6 +118,7 @@ export interface FileRouteTypes {
     | '/users'
     | '/account/$path'
     | '/auth/$path'
+    | '/ping/$pingId'
     | '/ping/create'
     | '/api/auth/$'
     | '/api/auth'
@@ -118,6 +129,7 @@ export interface FileRouteTypes {
     | '/users'
     | '/account/$path'
     | '/auth/$path'
+    | '/ping/$pingId'
     | '/ping/create'
     | '/api/auth/$'
     | '/api/auth/'
@@ -129,6 +141,7 @@ export interface RootRouteChildren {
   UsersRoute: typeof UsersRoute
   AccountPathRoute: typeof AccountPathRoute
   AuthPathRoute: typeof AuthPathRoute
+  PingPingIdRoute: typeof PingPingIdRoute
   PingCreateRoute: typeof PingCreateRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiAuthIndexRoute: typeof ApiAuthIndexRoute
@@ -162,6 +175,13 @@ declare module '@tanstack/react-router' {
       path: '/ping/create'
       fullPath: '/ping/create'
       preLoaderRoute: typeof PingCreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ping/$pingId': {
+      id: '/ping/$pingId'
+      path: '/ping/$pingId'
+      fullPath: '/ping/$pingId'
+      preLoaderRoute: typeof PingPingIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/$path': {
@@ -201,6 +221,7 @@ const rootRouteChildren: RootRouteChildren = {
   UsersRoute: UsersRoute,
   AccountPathRoute: AccountPathRoute,
   AuthPathRoute: AuthPathRoute,
+  PingPingIdRoute: PingPingIdRoute,
   PingCreateRoute: PingCreateRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiAuthIndexRoute: ApiAuthIndexRoute,

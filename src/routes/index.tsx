@@ -191,192 +191,308 @@ function IndexPage() {
                     </div>
 
                     {totalActivePings > 0 && (
-                        <div className="mt-2 bg-background rounded-lg border border-border overflow-y-auto max-h-[200px] scrollbar-hide">
-                            <div className="p-2 space-y-2">
+                        <div className="mt-3 bg-background/50 rounded-xl border border-border overflow-y-auto max-h-[280px] scrollbar-hide">
+                            <div className="p-3 space-y-3">
                                 {/* Created Pings */}
                                 {createdPings.map((ping: any) => (
-                                    <div
+                                    <Link
                                         key={ping.id}
-                                        className="p-2 rounded-lg border border-border bg-green-50/50 dark:bg-green-900/20"
+                                        to={`/ping/${ping.id}`}
+                                        className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-emerald-50/80 to-teal-50/80 dark:from-emerald-950/30 dark:to-teal-950/30 border border-emerald-200 dark:border-emerald-800 p-3 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 block"
                                     >
-                                        <div className="flex items-start gap-2">
-                                            <Gamepad2 className="h-4 w-4 text-primary mt-0.5" />
+                                        {/* Decorative top accent */}
+                                        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-t-xl" />
+
+                                        <div className="flex items-start justify-between gap-3">
                                             <div className="flex-1 min-w-0">
-                                                <p className="text-sm font-medium truncate">
-                                                    {ping.game ||
-                                                        "General Hangout"}
-                                                </p>
+                                                {/* Header with game icon and name */}
+                                                <div className="flex items-center gap-2 mb-2">
+                                                    <div className="h-8 w-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center">
+                                                        <Gamepad2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <p className="text-sm font-semibold text-foreground truncate">
+                                                            {ping.game ||
+                                                                "General Hangout"}
+                                                        </p>
+                                                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                                            <Clock className="h-3 w-3" />
+                                                            <span>
+                                                                {ping.scheduledEndAt
+                                                                    ? `${formatDateTime(ping.scheduledAt)} - ${formatDateTime(ping.scheduledEndAt)}`
+                                                                    : formatDateTime(
+                                                                          ping.scheduledAt
+                                                                      ) ||
+                                                                      "Now"}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/* Message */}
                                                 {ping.message && (
-                                                    <p className="text-xs text-muted-foreground truncate">
+                                                    <p className="text-xs text-muted-foreground mb-3 bg-white/50 dark:bg-black/20 rounded-lg px-2 py-1.5 border border-border/50">
                                                         {ping.message}
                                                     </p>
                                                 )}
-                                                <div className="flex items-center gap-2 mt-1">
-                                                    <Clock className="h-3 w-3 text-muted-foreground" />
-                                                    <span className="text-xs text-muted-foreground">
-                                                        {ping.scheduledEndAt
-                                                            ? `${formatDateTime(ping.scheduledAt)} - ${formatDateTime(ping.scheduledEndAt)}`
-                                                            : formatDateTime(
-                                                                  ping.scheduledAt
-                                                              ) || "Now"}
-                                                    </span>
-                                                </div>
-                                                {/* Participants */}
-                                                <div className="mt-2">
-                                                    <div className="flex items-center gap-1 flex-wrap">
-                                                        {ping.participants?.map(
-                                                            (
-                                                                participant: any
-                                                            ) => (
-                                                                <div
-                                                                    key={
-                                                                        participant
-                                                                            .user
-                                                                            .id
-                                                                    }
-                                                                    className="relative"
-                                                                    title={`${participant.user.name} - ${participant.status}`}
-                                                                >
-                                                                    <div
-                                                                        className={`h-6 w-6 rounded-full flex items-center justify-center border-2 ${participant.status === "accepted" ? "border-green-500" : "border-yellow-500"}`}
-                                                                    >
-                                                                        {participant
-                                                                            .user
-                                                                            .image ? (
-                                                                            <img
-                                                                                src={
-                                                                                    participant
-                                                                                        .user
-                                                                                        .image
-                                                                                }
-                                                                                alt={
-                                                                                    participant
-                                                                                        .user
-                                                                                        .name
-                                                                                }
-                                                                                className="h-full w-full rounded-full object-cover"
-                                                                            />
-                                                                        ) : (
-                                                                            <Users className="h-3 w-3 text-muted-foreground" />
-                                                                        )}
-                                                                    </div>
-                                                                    {participant.isCreator && (
-                                                                        <span className="absolute -top-1 -right-1 h-2 w-2 bg-primary rounded-full" />
-                                                                    )}
+
+                                                {/* Participants - Stacked avatars */}
+                                                <div className="flex items-center justify-between">
+                                                    <div className="flex items-center">
+                                                        <div className="flex -space-x-2">
+                                                            {ping.participants
+                                                                ?.slice(0, 4)
+                                                                .map(
+                                                                    (
+                                                                        participant: any,
+                                                                        idx: number
+                                                                    ) => (
+                                                                        <div
+                                                                            key={
+                                                                                participant
+                                                                                    .user
+                                                                                    .id
+                                                                            }
+                                                                            className="relative"
+                                                                            style={{
+                                                                                zIndex:
+                                                                                    10 -
+                                                                                    idx
+                                                                            }}
+                                                                            title={`${participant.user.name} - ${participant.status}`}
+                                                                        >
+                                                                            <div
+                                                                                className={`h-8 w-8 rounded-full border-2 ${participant.status === "accepted" ? "border-emerald-400 ring-2 ring-emerald-400/20" : "border-amber-400 ring-2 ring-amber-400/20"} bg-background overflow-hidden`}
+                                                                            >
+                                                                                {participant
+                                                                                    .user
+                                                                                    .image ? (
+                                                                                    <img
+                                                                                        src={
+                                                                                            participant
+                                                                                                .user
+                                                                                                .image
+                                                                                        }
+                                                                                        alt={
+                                                                                            participant
+                                                                                                .user
+                                                                                                .name
+                                                                                        }
+                                                                                        className="h-full w-full object-cover"
+                                                                                    />
+                                                                                ) : (
+                                                                                    <div className="h-full w-full bg-muted flex items-center justify-center">
+                                                                                        <Users className="h-4 w-4 text-muted-foreground" />
+                                                                                    </div>
+                                                                                )}
+                                                                            </div>
+                                                                            {participant.isCreator && (
+                                                                                <div className="absolute -bottom-0.5 -right-0.5 h-3 w-3 bg-primary rounded-full border-2 border-background flex items-center justify-center">
+                                                                                    <span className="text-[6px] font-bold text-primary-foreground">
+                                                                                        C
+                                                                                    </span>
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
+                                                                    )
+                                                                )}
+                                                            {ping.participants
+                                                                ?.length >
+                                                                4 && (
+                                                                <div className="h-8 w-8 rounded-full border-2 border-border bg-muted flex items-center justify-center text-xs font-medium text-muted-foreground">
+                                                                    +
+                                                                    {ping
+                                                                        .participants
+                                                                        .length -
+                                                                        4}
                                                                 </div>
-                                                            )
-                                                        )}
-                                                    </div>
-                                                    <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
-                                                        <span className="text-green-600">
-                                                            {
-                                                                ping.participants?.filter(
-                                                                    (p: any) =>
-                                                                        p.status ===
-                                                                        "accepted"
-                                                                ).length
-                                                            }{" "}
-                                                            accepted
-                                                        </span>
-                                                        <span>•</span>
-                                                        <span className="text-yellow-600">
-                                                            {
-                                                                ping.participants?.filter(
-                                                                    (p: any) =>
-                                                                        p.status ===
-                                                                        "pending"
-                                                                ).length
-                                                            }{" "}
-                                                            pending
-                                                        </span>
+                                                            )}
+                                                        </div>
+                                                        <div className="ml-3 flex flex-col text-xs">
+                                                            <span className="text-emerald-600 dark:text-emerald-400 font-medium">
+                                                                {
+                                                                    ping.participants?.filter(
+                                                                        (
+                                                                            p: any
+                                                                        ) =>
+                                                                            p.status ===
+                                                                            "accepted"
+                                                                    ).length
+                                                                }{" "}
+                                                                joined
+                                                            </span>
+                                                            <span className="text-amber-600 dark:text-amber-400">
+                                                                {
+                                                                    ping.participants?.filter(
+                                                                        (
+                                                                            p: any
+                                                                        ) =>
+                                                                            p.status ===
+                                                                            "pending"
+                                                                    ).length
+                                                                }{" "}
+                                                                pending
+                                                            </span>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <span
-                                                className={`text-xs px-2 py-0.5 rounded-full ${ping.status === "active" ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}`}
+
+                                            {/* Status badge */}
+                                            <div
+                                                className={`px-2.5 py-1 rounded-full text-xs font-medium ${ping.status === "active" ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300" : "bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300"}`}
                                             >
-                                                {ping.status}
-                                            </span>
+                                                {ping.status === "active"
+                                                    ? "● Active"
+                                                    : "○ Pending"}
+                                            </div>
                                         </div>
-                                    </div>
+                                    </Link>
                                 ))}
 
                                 {/* Invited Pings */}
                                 {invitedPings.map((ping: any) => (
-                                    <div
+                                    <Link
                                         key={ping.id}
-                                        className="p-2 rounded-lg border border-border bg-blue-50/50 dark:bg-blue-900/20"
+                                        to={`/ping/${ping.id}`}
+                                        className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-blue-50/80 to-indigo-50/80 dark:from-blue-950/30 dark:to-indigo-950/30 border border-blue-200 dark:border-blue-800 p-3 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 block"
                                     >
-                                        <div className="flex items-start gap-2">
-                                            <Gamepad2 className="h-4 w-4 text-primary mt-0.5" />
+                                        {/* Decorative top accent */}
+                                        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-400 to-indigo-400 rounded-t-xl" />
+
+                                        <div className="flex items-start justify-between gap-3">
                                             <div className="flex-1 min-w-0">
-                                                <p className="text-sm font-medium truncate">
-                                                    {ping.game ||
-                                                        "General Hangout"}
-                                                </p>
+                                                {/* Header with game icon and name */}
+                                                <div className="flex items-center gap-2 mb-2">
+                                                    <div className="h-8 w-8 rounded-lg bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center">
+                                                        <Gamepad2 className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <p className="text-sm font-semibold text-foreground truncate">
+                                                            {ping.game ||
+                                                                "General Hangout"}
+                                                        </p>
+                                                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                                            <Clock className="h-3 w-3" />
+                                                            <span>
+                                                                {ping.scheduledEndAt
+                                                                    ? `${formatDateTime(ping.scheduledAt)} - ${formatDateTime(ping.scheduledEndAt)}`
+                                                                    : formatDateTime(
+                                                                          ping.scheduledAt
+                                                                      ) ||
+                                                                      "Now"}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/* Message */}
                                                 {ping.message && (
-                                                    <p className="text-xs text-muted-foreground truncate">
+                                                    <p className="text-xs text-muted-foreground mb-3 bg-white/50 dark:bg-black/20 rounded-lg px-2 py-1.5 border border-border/50">
                                                         {ping.message}
                                                     </p>
                                                 )}
-                                                <div className="flex items-center gap-2 mt-1">
-                                                    <Clock className="h-3 w-3 text-muted-foreground" />
-                                                    <span className="text-xs text-muted-foreground">
-                                                        {ping.scheduledEndAt
-                                                            ? `${formatDateTime(ping.scheduledAt)} - ${formatDateTime(ping.scheduledEndAt)}`
-                                                            : formatDateTime(
-                                                                  ping.scheduledAt
-                                                              ) || "Now"}
-                                                    </span>
-                                                </div>
-                                                {/* Participants */}
-                                                <div className="mt-2">
-                                                    <div className="flex items-center gap-1 flex-wrap">
-                                                        {ping.participants?.map(
-                                                            (
-                                                                participant: any
-                                                            ) => (
-                                                                <div
-                                                                    key={
-                                                                        participant
-                                                                            .user
-                                                                            .id
-                                                                    }
-                                                                    className="relative"
-                                                                    title={`${participant.user.name} - ${participant.status}`}
-                                                                >
-                                                                    <div
-                                                                        className={`h-6 w-6 rounded-full flex items-center justify-center border-2 ${participant.status === "accepted" ? "border-green-500" : "border-yellow-500"}`}
-                                                                    >
-                                                                        {participant
-                                                                            .user
-                                                                            .image ? (
-                                                                            <img
-                                                                                src={
-                                                                                    participant
-                                                                                        .user
-                                                                                        .image
-                                                                                }
-                                                                                alt={
-                                                                                    participant
-                                                                                        .user
-                                                                                        .name
-                                                                                }
-                                                                                className="h-full w-full rounded-full object-cover"
-                                                                            />
-                                                                        ) : (
-                                                                            <Users className="h-3 w-3 text-muted-foreground" />
-                                                                        )}
-                                                                    </div>
-                                                                    {participant.isCreator && (
-                                                                        <span className="absolute -top-1 -right-1 h-2 w-2 bg-primary rounded-full" />
-                                                                    )}
-                                                                </div>
-                                                            )
+
+                                                {/* Invited by */}
+                                                <div className="flex items-center gap-2 mb-3">
+                                                    <div className="h-6 w-6 rounded-full border-2 border-blue-400 bg-background overflow-hidden">
+                                                        {ping.creator?.image ? (
+                                                            <img
+                                                                src={
+                                                                    ping.creator
+                                                                        .image
+                                                                }
+                                                                alt={
+                                                                    ping.creator
+                                                                        .name
+                                                                }
+                                                                className="h-full w-full object-cover"
+                                                            />
+                                                        ) : (
+                                                            <div className="h-full w-full bg-muted flex items-center justify-center">
+                                                                <Users className="h-3 w-3 text-muted-foreground" />
+                                                            </div>
                                                         )}
                                                     </div>
-                                                    <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
-                                                        <span className="text-green-600">
+                                                    <span className="text-xs text-muted-foreground">
+                                                        Invited by{" "}
+                                                        <span className="font-medium text-foreground">
+                                                            {ping.creator?.name}
+                                                        </span>
+                                                    </span>
+                                                </div>
+
+                                                {/* Participants - Stacked avatars */}
+                                                <div className="flex items-center">
+                                                    <div className="flex -space-x-2">
+                                                        {ping.participants
+                                                            ?.slice(0, 4)
+                                                            .map(
+                                                                (
+                                                                    participant: any,
+                                                                    idx: number
+                                                                ) => (
+                                                                    <div
+                                                                        key={
+                                                                            participant
+                                                                                .user
+                                                                                .id
+                                                                        }
+                                                                        className="relative"
+                                                                        style={{
+                                                                            zIndex:
+                                                                                10 -
+                                                                                idx
+                                                                        }}
+                                                                        title={`${participant.user.name} - ${participant.status}`}
+                                                                    >
+                                                                        <div
+                                                                            className={`h-8 w-8 rounded-full border-2 ${participant.status === "accepted" ? "border-emerald-400 ring-2 ring-emerald-400/20" : "border-amber-400 ring-2 ring-amber-400/20"} bg-background overflow-hidden`}
+                                                                        >
+                                                                            {participant
+                                                                                .user
+                                                                                .image ? (
+                                                                                <img
+                                                                                    src={
+                                                                                        participant
+                                                                                            .user
+                                                                                            .image
+                                                                                    }
+                                                                                    alt={
+                                                                                        participant
+                                                                                            .user
+                                                                                            .name
+                                                                                    }
+                                                                                    className="h-full w-full object-cover"
+                                                                                />
+                                                                            ) : (
+                                                                                <div className="h-full w-full bg-muted flex items-center justify-center">
+                                                                                    <Users className="h-4 w-4 text-muted-foreground" />
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
+                                                                        {participant.isCreator && (
+                                                                            <div className="absolute -bottom-0.5 -right-0.5 h-3 w-3 bg-primary rounded-full border-2 border-background flex items-center justify-center">
+                                                                                <span className="text-[6px] font-bold text-primary-foreground">
+                                                                                    C
+                                                                                </span>
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                )
+                                                            )}
+                                                        {ping.participants
+                                                            ?.length > 4 && (
+                                                            <div className="h-8 w-8 rounded-full border-2 border-border bg-muted flex items-center justify-center text-xs font-medium text-muted-foreground">
+                                                                +
+                                                                {ping
+                                                                    .participants
+                                                                    .length - 4}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <div className="ml-3 flex flex-col text-xs">
+                                                        <span className="text-emerald-600 dark:text-emerald-400 font-medium">
                                                             {
                                                                 ping.participants?.filter(
                                                                     (p: any) =>
@@ -384,10 +500,9 @@ function IndexPage() {
                                                                         "accepted"
                                                                 ).length
                                                             }{" "}
-                                                            accepted
+                                                            joined
                                                         </span>
-                                                        <span>•</span>
-                                                        <span className="text-yellow-600">
+                                                        <span className="text-amber-600 dark:text-amber-400">
                                                             {
                                                                 ping.participants?.filter(
                                                                     (p: any) =>
@@ -400,11 +515,19 @@ function IndexPage() {
                                                     </div>
                                                 </div>
                                             </div>
-                                            <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700">
-                                                invited
-                                            </span>
+
+                                            {/* Action button */}
+                                            <button
+                                                type="button"
+                                                className="px-3 py-1.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors"
+                                                onClick={(e) =>
+                                                    e.preventDefault()
+                                                }
+                                            >
+                                                Accept
+                                            </button>
                                         </div>
-                                    </div>
+                                    </Link>
                                 ))}
                             </div>
                         </div>
