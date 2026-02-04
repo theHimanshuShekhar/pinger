@@ -109,6 +109,70 @@ export const getFriendshipStatus = createServerFn({ method: "POST" }).handler(
     }
 )
 
+export const getFriendshipStatusesForUsers = createServerFn({
+    method: "POST"
+}).handler(async (ctx: any) => {
+    const request = getRequest()
+    const data = ctx.data as { userIds?: string[] }
+    const userIds = data?.userIds || []
+
+    const session = await auth.api.getSession({
+        headers: request.headers
+    })
+
+    if (!session?.user || userIds.length === 0) {
+        return {}
+    }
+
+    const userFriendships = await db
+        .select({
+            id: friendships.id,
+            senderId: friendships.senderId,
+            receiverId: friendships.receiverId,
+            status: friendships.status
+        })
+        .from(friendships)
+        .where(
+            and(
+                or(
+                    ...userIds.map((userId) =>
+                        or(
+                            and(
+                                eq(friendships.senderId, session.user.id),
+                                eq(friendships.receiverId, userId)
+                            ),
+                            and(
+                                eq(friendships.senderId, userId),
+                                eq(friendships.receiverId, session.user.id)
+                            )
+                        )
+                    )
+                ),
+                or(
+                    eq(friendships.status, "pending"),
+                    eq(friendships.status, "accepted"),
+                    eq(friendships.status, "blocked")
+                )
+            )
+        )
+
+    const statusMap: Record<string, { status: string; senderId?: string }> =
+        {}
+
+    for (const friendship of userFriendships) {
+        const otherUserId =
+            friendship.senderId === session.user.id
+                ? friendship.receiverId
+                : friendship.senderId
+        statusMap[otherUserId] = {
+            status: friendship.status,
+            senderId: friendship.senderId
+        }
+    }
+
+    return statusMap
+})
+
 export const sendFriendRequest = createServerFn({ method: "POST" }).handler(
     async (ctx: any) => {
         const request = getRequest()

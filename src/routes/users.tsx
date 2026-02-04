@@ -1,8 +1,10 @@
 import { createFileRoute, redirect } from "@tanstack/react-router"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import {
     Ban,
     Check,
     Clock,
+    Loader2,
     Search,
     User as UserIcon,
     UserPlus
@@ -12,10 +14,14 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
     getAllUsers,
+    getFriendshipStatusesForUsers,
     searchUsers,
     sendFriendRequest
 } from "@/lib/server/friendships"
 import { getCurrentUser } from "@/lib/server/users"
+
+const USERS_QUERY_KEY = "users"
+const FRIENDSHIP_STATUSES_QUERY_KEY = "friendship-statuses"
 
 export const Route = createFileRoute("/users")({
     beforeLoad: async () => {
@@ -39,38 +45,59 @@ interface User {
 }
 
 function UsersPage() {
+    const queryClient = useQueryClient()
     const { users: initialUsers } = Route.useLoaderData()
-    const [users, setUsers] = useState<User[]>(initialUsers)
     const [searchQuery, setSearchQuery] = useState("")
-    const [sendingRequest, setSendingRequest] = useState<string | null>(null)
-    const [friendshipStatuses, setFriendshipStatuses] = useState<
-        Record<string, { status: string; senderId?: string }>
-    >({})
 
-    const handleSearch = async (query: string) => {
+    // Use React Query for users with initial data from loader
+    const { data: users = initialUsers } = useQuery({
+        queryKey: [USERS_QUERY_KEY, searchQuery],
+        queryFn: async () => {
+            if (!searchQuery.trim()) {
+                return getAllUsers()
+            }
+            return searchUsers({ data: { q: searchQuery } })
+        },
+        initialData: searchQuery ? undefined : initialUsers
+    })
+
+    // Fetch friendship statuses for all users
+    const {
+        data: friendshipStatuses = {},
+        isLoading: isLoadingStatuses
+    } = useQuery({
+        queryKey: [FRIENDSHIP_STATUSES_QUERY_KEY, users.map((u) => u.id).join(",")],
+        queryFn: async () => {
+            if (users.length === 0) return {}
+            const userIds = users.map((user) => user.id)
+            return getFriendshipStatusesForUsers({ data: { userIds } })
+        },
+        enabled: users.length > 0
+    })
+
+    // Mutation for sending friend requests
+    const sendRequestMutation = useMutation({
+        mutationFn: async (receiverId: string) => {
+            await sendFriendRequest({ data: { receiverId } })
+        },
+        onSuccess: (_, receiverId) => {
+            // Update local cache
+            queryClient.setQueryData(
+                [FRIENDSHIP_STATUSES_QUERY_KEY, users.map((u) => u.id).join(",")],
+                (old: Record<string, { status: string; senderId?: string }> = {}) => ({
+                    ...old,
+                    [receiverId]: { status: "pending" }
+                })
+            )
+            // Invalidate to refresh from server
+            queryClient.invalidateQueries({
+                queryKey: [FRIENDSHIP_STATUSES_QUERY_KEY]
+            })
+        }
+    })
+
+    const handleSearch = (query: string) => {
         setSearchQuery(query)
-        if (!query.trim()) {
-            const allUsers = await getAllUsers()
-            setUsers(allUsers)
-        } else {
-            const foundUsers = await searchUsers({ data: { q: query } })
-            setUsers(foundUsers)
-        }
-    }
-
-    const handleSendRequest = async (userId: string) => {
-        setSendingRequest(userId)
-        try {
-            await sendFriendRequest({ data: { receiverId: userId } })
-            setFriendshipStatuses((prev) => ({
-                ...prev,
-                [userId]: { status: "pending" }
-            }))
-        } catch (error) {
-            console.error("Failed to send friend request:", error)
-        } finally {
-            setSendingRequest(null)
-        }
     }
 
     const getFriendshipStatusDisplay = (userId: string) => {
@@ -85,6 +112,41 @@ function UsersPage() {
             return { icon: Ban, text: "Blocked", color: "text-red-500" }
         }
         return null
+    }
+
+    // Render loading state while friendship statuses are loading
+    const renderFriendshipAction = (userId: string) => {
+        // Show loading spinner while fetching statuses
+        if (isLoadingStatuses) {
+            return (
+                <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                </div>
+            )
+        }
+
+        const statusDisplay = getFriendshipStatusDisplay(userId)
+        const isSending = sendRequestMutation.isPending && sendRequestMutation.variables === userId
+
+        if (statusDisplay) {
+            return (
+                <div className={`flex items-center gap-1 text-sm ${statusDisplay.color}`}>
+                    <statusDisplay.icon className="h-4 w-4" />
+                    <span className="hidden sm:inline">{statusDisplay.text}</span>
+                </div>
+            )
+        }
+
+        return (
+            <Button
+                size="sm"
+                onClick={() => sendRequestMutation.mutate(userId)}
+                disabled={isSending}
+            >
+                <UserPlus className="h-4 w-4 mr-1" />
+                <span className="hidden sm:inline">Add</span>
+            </Button>
+        )
     }
 
     return (
@@ -135,61 +197,33 @@ function UsersPage() {
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {users.map((user) => {
-                                const statusDisplay =
-                                    getFriendshipStatusDisplay(user.id)
-                                const isSending = sendingRequest === user.id
-
-                                return (
-                                    <div
-                                        key={user.id}
-                                        className="bg-muted rounded-lg p-4 flex items-center gap-4"
-                                    >
-                                        <div className="h-12 w-12 rounded-full bg-background flex items-center justify-center flex-shrink-0">
-                                            {user.image ? (
-                                                <img
-                                                    src={user.image}
-                                                    alt={user.name}
-                                                    className="h-full w-full rounded-full object-cover"
-                                                />
-                                            ) : (
-                                                <UserIcon className="h-6 w-6 text-muted-foreground" />
-                                            )}
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <h3 className="font-medium truncate">
-                                                {user.name}
-                                            </h3>
-                                            <p className="text-sm text-muted-foreground truncate">
-                                                {user.email}
-                                            </p>
-                                        </div>
-                                        {statusDisplay ? (
-                                            <div
-                                                className={`flex items-center gap-1 text-sm ${statusDisplay.color}`}
-                                            >
-                                                <statusDisplay.icon className="h-4 w-4" />
-                                                <span className="hidden sm:inline">
-                                                    {statusDisplay.text}
-                                                </span>
-                                            </div>
+                            {users.map((user) => (
+                                <div
+                                    key={user.id}
+                                    className="bg-muted rounded-lg p-4 flex items-center gap-4"
+                                >
+                                    <div className="h-12 w-12 rounded-full bg-background flex items-center justify-center flex-shrink-0">
+                                        {user.image ? (
+                                            <img
+                                                src={user.image}
+                                                alt={user.name}
+                                                className="h-full w-full rounded-full object-cover"
+                                            />
                                         ) : (
-                                            <Button
-                                                size="sm"
-                                                onClick={() =>
-                                                    handleSendRequest(user.id)
-                                                }
-                                                disabled={isSending}
-                                            >
-                                                <UserPlus className="h-4 w-4 mr-1" />
-                                                <span className="hidden sm:inline">
-                                                    Add
-                                                </span>
-                                            </Button>
+                                            <UserIcon className="h-6 w-6 text-muted-foreground" />
                                         )}
                                     </div>
-                                )
-                            })}
+                                    <div className="flex-1 min-w-0">
+                                        <h3 className="font-medium truncate">
+                                            {user.name}
+                                        </h3>
+                                        <p className="text-sm text-muted-foreground truncate">
+                                            {user.email}
+                                        </p>
+                                    </div>
+                                    {renderFriendshipAction(user.id)}
+                                </div>
+                            ))}
                         </div>
                     )}
                 </div>

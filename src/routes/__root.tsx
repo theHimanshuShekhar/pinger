@@ -1,4 +1,3 @@
-import type { QueryClient } from "@tanstack/react-query"
 import {
     createRootRouteWithContext,
     HeadContent,
@@ -10,7 +9,6 @@ import { Providers } from "@/components/providers"
 import appCss from "../styles/styles.css?url"
 
 interface MyRouterContext {
-    queryClient: QueryClient
     user: User | null
 }
 

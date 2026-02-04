@@ -8,6 +8,13 @@
       "when": 1769989376018,
       "tag": "0000_dry_blizzard",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1770119347429,
+      "tag": "0001_premium_kingpin",
+      "breakpoints": true
     }
   ]
 }
