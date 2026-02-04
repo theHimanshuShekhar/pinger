@@ -1,11 +1,19 @@
-import { useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { createFileRoute, Link, useParams } from "@tanstack/react-router"
-import { ArrowLeft, Gamepad2, MessageSquare, Send, Users } from "lucide-react"
+import {
+    ArrowLeft,
+    Gamepad2,
+    LogOut,
+    MessageSquare,
+    Send,
+    Users,
+    X
+} from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { authClient } from "@/lib/auth-client"
-import { getActivePings } from "@/lib/server/pings"
+import { getActivePings, respondToPingInvite } from "@/lib/server/pings"
 
 const PINGS_QUERY_KEY = "pings"
 

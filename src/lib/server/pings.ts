@@ -1,13 +1,12 @@
 import { createServerFn } from "@tanstack/react-start"
 import { getRequest } from "@tanstack/react-start/server"
 import { and, eq, gt, inArray, or } from "drizzle-orm"
-import { pingInvites, pings } from "@/../auth-schema"
-import { db } from "@/database/db"
-import { auth } from "@/lib/auth"
+import { pingInvites, pings } from "../../../auth-schema"
+import { db } from "../../database/db"
+import { auth } from "../auth"
 
 const PING_EXPIRY_HOURS = 1
 
-// Helper to generate ID
 function generateId(): string {
     return (
         Math.random().toString(36).substring(2, 15) +
@@ -15,7 +14,6 @@ function generateId(): string {
     )
 }
 
-// Get current user from session
 async function getCurrentUserFromRequest() {
     const request = getRequest()
     if (!request) return null
@@ -26,24 +24,26 @@ async function getCurrentUserFromRequest() {
     return session?.user ?? null
 }
 
-// Create a new ping with invites
 export const createPing = createServerFn({ method: "POST" }).handler(
-    async (ctx: any) => {
+    async (ctx) => {
         const user = await getCurrentUserFromRequest()
         if (!user) {
             throw new Error("Unauthorized")
         }
 
-        const data = ctx.data as {
-            message?: string
-            game?: string
-            scheduledAt?: string
-            scheduledEndAt?: string
-            invitedUserIds: string[]
+        const data = ctx.data
+        if (!data) {
+            throw new Error("No data provided")
         }
 
         const { message, game, scheduledAt, scheduledEndAt, invitedUserIds } =
-            data
+            data as {
+                message?: string
+                game?: string
+                scheduledAt?: string
+                scheduledEndAt?: string
+                invitedUserIds: string[]
+            }
 
         if (!invitedUserIds || invitedUserIds.length === 0) {
             throw new Error("Must invite at least one friend")
@@ -54,7 +54,6 @@ export const createPing = createServerFn({ method: "POST" }).handler(
             now.getTime() + PING_EXPIRY_HOURS * 60 * 60 * 1000
         )
 
-        // Create the ping
         const pingId = generateId()
         await db.insert(pings).values({
             id: pingId,
@@ -68,7 +67,6 @@ export const createPing = createServerFn({ method: "POST" }).handler(
             expiresAt
         })
 
-        // Create invites for each friend
         const inviteValues = invitedUserIds.map((userId) => ({
             id: generateId(),
             pingId,
@@ -82,7 +80,6 @@ export const createPing = createServerFn({ method: "POST" }).handler(
     }
 )
 
-// Get active pings for the current user (as creator or invitee)
 export const getActivePings = createServerFn({ method: "GET" }).handler(
     async () => {
         const user = await getCurrentUserFromRequest()
@@ -92,7 +89,6 @@ export const getActivePings = createServerFn({ method: "GET" }).handler(
 
         const now = new Date()
 
-        // Get pings where user is creator
         const createdPingsRaw = await db.query.pings.findMany({
             where: and(
                 eq(pings.creatorId, user.id),
@@ -115,7 +111,6 @@ export const getActivePings = createServerFn({ method: "GET" }).handler(
             orderBy: (pings, { desc }) => [desc(pings.createdAt)]
         })
 
-        // Add creator as accepted participant
         const createdPings = createdPingsRaw.map((ping) => ({
             ...ping,
             participants: [
@@ -132,7 +127,6 @@ export const getActivePings = createServerFn({ method: "GET" }).handler(
             ]
         }))
 
-        // Get pings where user is invited
         const invitedPingIds = await db.query.pingInvites.findMany({
             where: and(
                 eq(pingInvites.userId, user.id),
@@ -181,7 +175,6 @@ export const getActivePings = createServerFn({ method: "GET" }).handler(
                   })
                 : []
 
-        // Add creator as accepted participant for invited pings
         const invitedPings = invitedPingsRaw.map((ping) => ({
             ...ping,
             participants: [
@@ -205,21 +198,23 @@ export const getActivePings = createServerFn({ method: "GET" }).handler(
     }
 )
 
-// Respond to a ping invite (accept/decline)
 export const respondToPingInvite = createServerFn({ method: "POST" }).handler(
-    async (ctx: any) => {
+    async (ctx) => {
         const user = await getCurrentUserFromRequest()
         if (!user) {
             throw new Error("Unauthorized")
         }
 
-        const data = ctx.data as {
+        const data = ctx.data
+        if (!data) {
+            throw new Error("No data provided")
+        }
+
+        const { pingId, action } = data as {
             pingId: string
             action: "accept" | "decline"
         }
-        const { pingId, action } = data
 
-        // Find the invite
         const invite = await db.query.pingInvites.findFirst({
             where: and(
                 eq(pingInvites.pingId, pingId),
@@ -235,7 +230,6 @@ export const respondToPingInvite = createServerFn({ method: "POST" }).handler(
             throw new Error("Already responded to this invite")
         }
 
-        // Update invite status
         await db
             .update(pingInvites)
             .set({
@@ -244,7 +238,6 @@ export const respondToPingInvite = createServerFn({ method: "POST" }).handler(
             })
             .where(eq(pingInvites.id, invite.id))
 
-        // If accepted, update ping activity and status
         if (action === "accept") {
             const now = new Date()
             const newExpiry = new Date(
@@ -265,18 +258,20 @@ export const respondToPingInvite = createServerFn({ method: "POST" }).handler(
     }
 )
 
-// Update ping activity (when someone sends a message, etc.)
 export const updatePingActivity = createServerFn({ method: "POST" }).handler(
-    async (ctx: any) => {
+    async (ctx) => {
         const user = await getCurrentUserFromRequest()
         if (!user) {
             throw new Error("Unauthorized")
         }
 
-        const data = ctx.data as { pingId: string }
-        const { pingId } = data
+        const data = ctx.data
+        if (!data) {
+            throw new Error("No data provided")
+        }
 
-        // Verify user is part of this ping (either creator or invited)
+        const { pingId } = data as { pingId: string }
+
         const ping = await db.query.pings.findFirst({
             where: eq(pings.id, pingId)
         })
@@ -286,8 +281,6 @@ export const updatePingActivity = createServerFn({ method: "POST" }).handler(
         }
 
         const isCreator = ping.creatorId === user.id
-
-        // Check if user has an invite for this ping
         const userInvite = await db.query.pingInvites.findFirst({
             where: and(
                 eq(pingInvites.pingId, pingId),
@@ -316,7 +309,6 @@ export const updatePingActivity = createServerFn({ method: "POST" }).handler(
     }
 )
 
-// Mark expired pings
 export const expireOldPings = createServerFn({ method: "POST" }).handler(
     async () => {
         const now = new Date()
