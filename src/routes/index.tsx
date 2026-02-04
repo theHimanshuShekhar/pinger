@@ -406,43 +406,6 @@ function IndexPage() {
                                         key={ping.id}
                                         className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-blue-50/80 to-indigo-50/80 dark:from-blue-950/30 dark:to-indigo-950/30 border border-blue-200 dark:border-blue-800 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5"
                                     >
-                                        {/* Accept/Decline buttons positioned absolutely */}
-                                        <div className="absolute top-2 right-2 z-10 flex gap-1">
-                                            <Button
-                                                size="sm"
-                                                className="h-7 px-2 text-xs bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900/50 dark:text-blue-300 dark:hover:bg-blue-800"
-                                                onClick={(e) =>
-                                                    handlePingResponse(
-                                                        ping.id,
-                                                        "accept",
-                                                        e
-                                                    )
-                                                }
-                                                disabled={
-                                                    respondToPingMutation.isPending
-                                                }
-                                            >
-                                                Accept
-                                            </Button>
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                className="h-7 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-100 dark:hover:bg-red-900/30"
-                                                onClick={(e) =>
-                                                    handlePingResponse(
-                                                        ping.id,
-                                                        "decline",
-                                                        e
-                                                    )
-                                                }
-                                                disabled={
-                                                    respondToPingMutation.isPending
-                                                }
-                                            >
-                                                <X className="h-3 w-3" />
-                                            </Button>
-                                        </div>
-
                                         <Link
                                             to={`/ping/${ping.id}`}
                                             className="block p-3"
@@ -451,10 +414,10 @@ function IndexPage() {
                                             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-400 to-indigo-400 rounded-t-xl" />
 
                                             <div className="flex items-start justify-between gap-3">
-                                                <div className="flex-1 min-w-0 pr-24">
-                                                    {/* Header with game icon and name */}
+                                                <div className="flex-1 min-w-0">
+                                                    {/* Header with game icon, name, and buttons */}
                                                     <div className="flex items-center gap-2 mb-2">
-                                                        <div className="h-8 w-8 rounded-lg bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center">
+                                                        <div className="h-8 w-8 rounded-lg bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center shrink-0">
                                                             <Gamepad2 className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                                                         </div>
                                                         <div className="flex-1 min-w-0">
@@ -473,6 +436,42 @@ function IndexPage() {
                                                                           "Now"}
                                                                 </span>
                                                             </div>
+                                                        </div>
+                                                        {/* Accept/Decline buttons inline */}
+                                                        <div className="flex gap-1 shrink-0">
+                                                            <Button
+                                                                size="sm"
+                                                                className="h-7 px-2 text-xs bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+                                                                onClick={(e) =>
+                                                                    handlePingResponse(
+                                                                        ping.id,
+                                                                        "accept",
+                                                                        e
+                                                                    )
+                                                                }
+                                                                disabled={
+                                                                    respondToPingMutation.isPending
+                                                                }
+                                                            >
+                                                                Accept
+                                                            </Button>
+                                                            <Button
+                                                                variant="outline"
+                                                                size="sm"
+                                                                className="h-7 w-7 p-0 text-red-600 border-red-200 hover:text-red-700 hover:bg-red-50 hover:border-red-300 dark:border-red-800 dark:hover:bg-red-900/30"
+                                                                onClick={(e) =>
+                                                                    handlePingResponse(
+                                                                        ping.id,
+                                                                        "decline",
+                                                                        e
+                                                                    )
+                                                                }
+                                                                disabled={
+                                                                    respondToPingMutation.isPending
+                                                                }
+                                                            >
+                                                                <X className="h-3 w-3" />
+                                                            </Button>
                                                         </div>
                                                     </div>
 
