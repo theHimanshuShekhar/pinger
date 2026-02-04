@@ -126,7 +126,8 @@ function formatDateTime(dateStr: string | Date | null) {
         month: "short",
         day: "numeric",
         hour: "numeric",
-        minute: "2-digit"
+        minute: "2-digit",
+        timeZone: "UTC"
     })
 }
 
