@@ -1,13 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import {
-    Activity,
-    Check,
-    Radio,
-    UserPlus,
-    Users,
-    X
-} from "lucide-react"
+import { createFileRoute, Link } from "@tanstack/react-router"
+import { Activity, Check, Radio, UserPlus, Users, X } from "lucide-react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import {
@@ -76,7 +69,9 @@ function FriendRequestItem({
                     )}
                 </div>
                 <div className="min-w-0">
-                    <p className="font-medium truncate">{request.sender.name}</p>
+                    <p className="font-medium truncate">
+                        {request.sender.name}
+                    </p>
                     <p className="text-sm text-muted-foreground truncate">
                         {request.sender.email}
                     </p>
@@ -128,7 +123,10 @@ function FriendRequestsList({
     return (
         <div className="flex flex-col gap-2 p-2">
             {requests.map((request) => (
-                <FriendRequestItem key={request.friendship.id} request={request} />
+                <FriendRequestItem
+                    key={request.friendship.id}
+                    request={request}
+                />
             ))}
         </div>
     )
@@ -192,13 +190,9 @@ function FriendsList({
 
 function IndexPage() {
     const loaderData = Route.useLoaderData()
-    
-    // Debug: Log the loader data
-    console.log("Loader data:", loaderData)
-    console.log("Pending requests count:", loaderData?.pendingRequests?.length)
-    console.log("Friends count:", loaderData?.friends?.length)
 
-    const { pendingRequests: initialPending, friends: initialFriends } = loaderData
+    const { pendingRequests: initialPending, friends: initialFriends } =
+        loaderData
 
     // Use React Query to fetch and cache data with automatic refetching
     const { data: pendingRequests = [] } = useQuery({
@@ -214,10 +208,6 @@ function IndexPage() {
         initialData: initialFriends || [],
         staleTime: 1000 * 30 // 30 seconds
     })
-
-    // Debug: Log the actual data being used
-    console.log("Pending requests:", pendingRequests)
-    console.log("Friends:", friends)
 
     return (
         <div className="h-full w-full flex flex-col gap-4 p-4">

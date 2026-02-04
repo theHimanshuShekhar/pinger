@@ -35,18 +35,20 @@ export function UserCounter() {
                 wsRef.current.close()
             }
 
-            // Use separate WebSocket port to avoid Vite HMR conflicts
+            // Determine WebSocket URL based on environment
             const protocol =
                 window.location.protocol === "https:" ? "wss:" : "ws:"
-            const wsUrl = `${protocol}//localhost:3001`
-
-            console.log("[UserCounter] Connecting to:", wsUrl)
+            const isDev = import.meta.env.DEV
+            // In dev, use separate port to avoid Vite HMR conflicts
+            // In prod, use same host:port as HTTP server
+            const wsUrl = isDev
+                ? `${protocol}//localhost:3001`
+                : `${protocol}//${window.location.host}`
 
             const ws = new WebSocket(wsUrl)
             wsRef.current = ws
 
             ws.onopen = () => {
-                console.log("[UserCounter] WebSocket connected")
                 setConnected(true)
                 isConnectingRef.current = false
 
@@ -79,12 +81,7 @@ export function UserCounter() {
                 }
             }
 
-            ws.onclose = (event) => {
-                console.log(
-                    "[UserCounter] WebSocket closed:",
-                    event.code,
-                    event.reason
-                )
+            ws.onclose = () => {
                 setConnected(false)
                 wsRef.current = null
                 isConnectingRef.current = false
@@ -96,8 +93,7 @@ export function UserCounter() {
                 }, 3000)
             }
 
-            ws.onerror = (error) => {
-                console.error("[UserCounter] WebSocket error:", error)
+            ws.onerror = () => {
                 isConnectingRef.current = false
             }
         },
