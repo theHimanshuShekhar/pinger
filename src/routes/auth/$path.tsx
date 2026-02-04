@@ -1,5 +1,5 @@
-import { AuthView } from "@daveyplate/better-auth-ui"
-import { createFileRoute } from "@tanstack/react-router"
+import { AuthView, SignedIn, SignedOut } from "@daveyplate/better-auth-ui"
+import { createFileRoute, Navigate } from "@tanstack/react-router"
 
 export const Route = createFileRoute("/auth/$path")({
     component: RouteComponent
@@ -10,7 +10,12 @@ function RouteComponent() {
 
     return (
         <main className="container items-center flex flex-col mx-auto my-auto p-4 md:p-6">
-            <AuthView path={path} />
+            <SignedOut>
+                <AuthView path={path} />
+            </SignedOut>
+            <SignedIn>
+                <Navigate to="/" replace />
+            </SignedIn>
         </main>
     )
 }

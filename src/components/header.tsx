@@ -1,5 +1,6 @@
 import { UserButton } from "@daveyplate/better-auth-ui"
 import { Link } from "@tanstack/react-router"
+import { User } from "lucide-react"
 
 import { UserCounter } from "./user-counter"
 
@@ -23,18 +24,17 @@ export function Header() {
                         <UserButton size="icon" />
                     </div>
                     <div className="hidden md:block">
-                        <UserButton size="sm"
+                        <UserButton
+                            size="sm"
                             disableDefaultLinks={true}
-                            additionalLinks={
-                                [
-                                    {
-                                        label: "Profile",
-                                        href: "/profile",
-                                        icon: "👤",
-                                        separator: true
-                                    },
-                                ]
-                            }
+                            additionalLinks={[
+                                {
+                                    label: "Profile",
+                                    href: "/profile",
+                                    icon: <User className="h-4 w-4" />,
+                                    separator: true
+                                }
+                            ]}
                         />
                     </div>
                 </div>
