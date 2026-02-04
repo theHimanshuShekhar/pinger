@@ -26,11 +26,11 @@ function ProfilePage() {
 
     return (
         <div className="h-full w-full p-2 sm:p-3 overflow-hidden">
-            <div className="h-full flex flex-col gap-2 sm:gap-3">
+            <div className="container mx-auto h-full flex flex-col gap-2 sm:gap-3">
                 {/* Profile Info Card - compact, takes only needed space */}
-                <div className="flex-none bg-background rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.15)] border border-border p-3 sm:p-4">
+                <div className="flex-none bg-muted rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.15)] border-2 border-border p-3 sm:p-4">
                     <div className="flex items-center gap-3 mb-3">
-                        <div className="h-12 w-12 sm:h-14 sm:w-14 rounded-full bg-muted flex items-center justify-center text-xl sm:text-2xl font-semibold border-2 border-border flex-shrink-0">
+                        <div className="h-12 w-12 sm:h-14 sm:w-14 rounded-full bg-background flex items-center justify-center text-xl sm:text-2xl font-semibold border-2 border-border flex-shrink-0">
                             {user!.image ? (
                                 <img
                                     src={user!.image}
@@ -55,7 +55,7 @@ function ProfilePage() {
 
                     {/* Profile Details - compact horizontal layout */}
                     <div className="grid grid-cols-3 gap-2">
-                        <div className="flex items-center gap-2 p-2 rounded-lg bg-muted">
+                        <div className="flex items-center gap-2 p-2 rounded-lg bg-background border border-border">
                             <Mail className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                             <div className="min-w-0">
                                 <p className="text-xs font-medium">Email</p>
@@ -65,7 +65,7 @@ function ProfilePage() {
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-2 p-2 rounded-lg bg-muted">
+                        <div className="flex items-center gap-2 p-2 rounded-lg bg-background border border-border">
                             <UserIcon className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                             <div className="min-w-0">
                                 <p className="text-xs font-medium">User ID</p>
@@ -75,7 +75,7 @@ function ProfilePage() {
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-2 p-2 rounded-lg bg-muted">
+                        <div className="flex items-center gap-2 p-2 rounded-lg bg-background border border-border">
                             <Calendar className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                             <div className="min-w-0">
                                 <p className="text-xs font-medium">Joined</p>
@@ -93,7 +93,7 @@ function ProfilePage() {
                     </div>
 
                     {user!.emailVerified && (
-                        <div className="mt-2 flex items-center gap-2 p-2 rounded-lg bg-green-100 dark:bg-green-900 w-fit">
+                        <div className="mt-2 flex items-center gap-2 p-2 rounded-lg bg-green-50 dark:bg-green-900/50 border border-green-200 dark:border-green-800 w-fit">
                             <div className="h-2 w-2 rounded-full bg-green-500 flex-shrink-0" />
                             <p className="text-xs font-medium text-green-700 dark:text-green-300">
                                 Email Verified
@@ -105,10 +105,10 @@ function ProfilePage() {
                 {/* Top Roommates + Friends Grid - takes remaining space */}
                 <div className="flex-1 min-h-0 grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3">
                     {/* Top Roommates Section */}
-                    <div className="bg-background rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.15)] border border-border p-3 sm:p-4 flex flex-col overflow-hidden">
-                        <div className="flex items-center gap-2 mb-2">
-                            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                                <Clock className="h-4 w-4 text-primary" />
+                    <div className="bg-muted rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.15)] border-2 border-border p-3 sm:p-4 flex flex-col overflow-hidden">
+                        <div className="flex items-center gap-2 sm:gap-3">
+                            <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                                <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                             </div>
                             <div>
                                 <h2 className="text-sm sm:text-base font-semibold">
@@ -121,22 +121,17 @@ function ProfilePage() {
                         </div>
 
                         <div className="flex-1 flex items-center justify-center min-h-0">
-                            <div className="flex items-center gap-3">
-                                <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
-                                    <Clock className="h-4 w-4 text-muted-foreground" />
-                                </div>
-                                <p className="text-xs text-muted-foreground">
-                                    No room history yet
-                                </p>
-                            </div>
+                            <p className="text-xs text-muted-foreground">
+                                No room history yet
+                            </p>
                         </div>
                     </div>
 
                     {/* Friends Section - shows actual friends */}
-                    <div className="bg-background rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.15)] border border-border p-3 sm:p-4 flex flex-col overflow-hidden">
-                        <div className="flex items-center gap-2 mb-2">
-                            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                                <Users className="h-4 w-4 text-primary" />
+                    <div className="bg-muted rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.15)] border-2 border-border p-3 sm:p-4 flex flex-col overflow-hidden">
+                        <div className="flex items-center gap-2 sm:gap-3">
+                            <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                                <Users className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                             </div>
                             <div>
                                 <h2 className="text-sm sm:text-base font-semibold">
@@ -152,8 +147,8 @@ function ProfilePage() {
                         </div>
 
                         {friends.length > 0 ? (
-                            <div className="flex-1 min-h-0 overflow-x-auto scrollbar-hide [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                                <div className="flex flex-row gap-2 p-1">
+                            <div className="flex-1 min-h-0 mt-2 bg-background rounded-lg border border-border overflow-x-auto scrollbar-hide [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                                <div className="flex flex-row gap-2 p-2">
                                     {friends.map((friend) => (
                                         <FriendItem
                                             key={friend.friendship.id}
@@ -165,14 +160,9 @@ function ProfilePage() {
                             </div>
                         ) : (
                             <div className="flex-1 flex items-center justify-center min-h-0">
-                                <div className="flex items-center gap-3">
-                                    <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
-                                        <Users className="h-4 w-4 text-muted-foreground" />
-                                    </div>
-                                    <p className="text-xs text-muted-foreground">
-                                        No friends yet
-                                    </p>
-                                </div>
+                                <p className="text-xs text-muted-foreground">
+                                    No friends yet
+                                </p>
                             </div>
                         )}
                     </div>

@@ -168,7 +168,7 @@ function UsersPage() {
         <div className="h-full w-full p-2 sm:p-3 overflow-hidden">
             <div className="container mx-auto h-full flex flex-col gap-2 sm:gap-3">
                 {/* Header - flex-none so it only takes needed space */}
-                <div className="flex-none bg-background rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.15)] border border-border p-3 sm:p-4">
+                <div className="flex-none bg-muted rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.15)] border-2 border-border p-3 sm:p-4">
                     <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
                         <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-primary/10 flex items-center justify-center">
                             <UserIcon className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
@@ -193,35 +193,29 @@ function UsersPage() {
                             onChange={(
                                 e: React.ChangeEvent<HTMLInputElement>
                             ) => handleSearch(e.target.value)}
-                            className="pl-10 h-9 sm:h-10"
+                            className="pl-10 h-9 sm:h-10 bg-background border-2 border-border"
                         />
                     </div>
                 </div>
 
                 {/* Users List - shrinks when empty, expands when has content */}
                 <div
-                    className={`bg-background rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.15)] border border-border p-3 sm:p-4 overflow-hidden flex flex-col ${users.length === 0 ? "flex-none h-auto" : "flex-1 min-h-0"}`}
+                    className={`bg-muted rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.15)] border-2 border-border p-3 sm:p-4 overflow-hidden flex flex-col ${users.length === 0 ? "flex-none h-auto" : "flex-1 min-h-0"}`}
                 >
                     {users.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center text-center py-4">
-                            <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-muted flex items-center justify-center mb-2">
-                                <Search className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
-                            </div>
-                            <h3 className="text-sm sm:text-base font-medium">
+                        <div className="flex items-center justify-center py-4">
+                            <p className="text-xs text-muted-foreground">
                                 No users found
-                            </h3>
-                            <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-                                Try adjusting your search terms
                             </p>
                         </div>
                     ) : (
-                        <div className="flex-1 overflow-x-auto scrollbar-hide flex flex-nowrap gap-3 pb-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                             {users.map((user) => (
                                 <div
                                     key={user.id}
-                                    className="bg-muted rounded-lg p-2 sm:p-3 flex flex-col items-center gap-2 flex-shrink-0 w-28 sm:w-32"
+                                    className="bg-background rounded-xl border border-border p-2 sm:p-3 flex items-center gap-3"
                                 >
-                                    <div className="h-12 w-12 sm:h-14 sm:w-14 rounded-full bg-background flex items-center justify-center flex-shrink-0">
+                                    <div className="h-10 w-10 rounded-full bg-muted border border-border flex items-center justify-center flex-shrink-0">
                                         {user.image ? (
                                             <img
                                                 src={user.image}
@@ -229,10 +223,10 @@ function UsersPage() {
                                                 className="h-full w-full rounded-full object-cover"
                                             />
                                         ) : (
-                                            <UserIcon className="h-6 w-6 sm:h-7 sm:w-7 text-muted-foreground" />
+                                            <UserIcon className="h-5 w-5 text-muted-foreground" />
                                         )}
                                     </div>
-                                    <div className="text-center min-w-0 w-full">
+                                    <div className="flex-1 min-w-0">
                                         <h3 className="text-xs sm:text-sm font-medium truncate">
                                             {user.name}
                                         </h3>
@@ -240,7 +234,7 @@ function UsersPage() {
                                             {user.email}
                                         </p>
                                     </div>
-                                    <div className="mt-1">
+                                    <div className="flex-shrink-0">
                                         {renderFriendshipAction(user.id)}
                                     </div>
                                 </div>
