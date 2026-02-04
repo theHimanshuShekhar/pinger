@@ -23,7 +23,19 @@ export function Header() {
                         <UserButton size="icon" />
                     </div>
                     <div className="hidden md:block">
-                        <UserButton size="sm" />
+                        <UserButton size="sm"
+                            disableDefaultLinks={true}
+                            additionalLinks={
+                                [
+                                    {
+                                        label: "Profile",
+                                        href: "/profile",
+                                        icon: "👤",
+                                        separator: true
+                                    },
+                                ]
+                            }
+                        />
                     </div>
                 </div>
             </div>
