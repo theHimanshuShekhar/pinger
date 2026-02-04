@@ -191,8 +191,8 @@ function IndexPage() {
                     </div>
 
                     {totalActivePings > 0 && (
-                        <div className="mt-3 bg-background/50 rounded-xl border border-border overflow-y-auto max-h-[280px] scrollbar-hide">
-                            <div className="p-3 space-y-3">
+                        <div className="mt-3 -mx-1 overflow-y-auto max-h-[280px] scrollbar-hide">
+                            <div className="space-y-2 px-1 pb-1">
                                 {/* Created Pings */}
                                 {createdPings.map((ping: any) => (
                                     <Link

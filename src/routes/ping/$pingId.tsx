@@ -1,24 +1,26 @@
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, Link, useParams } from "@tanstack/react-router"
-import {
-    ArrowLeft,
-    Clock,
-    Gamepad2,
-    MessageSquare,
-    Send,
-    Users
-} from "lucide-react"
-import { useState } from "react"
+import { ArrowLeft, Gamepad2, MessageSquare, Send, Users } from "lucide-react"
+import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { getActivePings, updatePingActivity } from "@/lib/server/pings"
+import { authClient } from "@/lib/auth-client"
+import { getActivePings } from "@/lib/server/pings"
 
 const PINGS_QUERY_KEY = "pings"
+
+interface ChatMessage {
+    id: string
+    userId: string
+    userName: string
+    userImage?: string
+    text: string
+    timestamp: Date
+}
 
 export const Route = createFileRoute("/ping/$pingId")({
     component: PingChatPage,
     loader: async ({ params }) => {
-        // Load pings to get the specific ping data
         const pings = await getActivePings()
         const allPings = [...pings.created, ...pings.invited]
         const ping = allPings.find((p: any) => p.id === params.pingId)
@@ -41,9 +43,93 @@ function PingChatPage() {
     const { pingId } = useParams({ from: "/ping/$pingId" })
     const { ping: initialPing } = Route.useLoaderData()
     const [message, setMessage] = useState("")
-    const [messages, setMessages] = useState<
-        Array<{ id: string; userId: string; text: string; timestamp: Date }>
-    >([])
+    const [messages, setMessages] = useState<ChatMessage[]>([])
+    const [userId, setUserId] = useState<string | null>(null)
+    const wsRef = useRef<WebSocket | null>(null)
+    const messagesEndRef = useRef<HTMLDivElement>(null)
+
+    // Get current user
+    useEffect(() => {
+        const getUser = async () => {
+            const { data } = await authClient.getSession()
+            if (data?.user) {
+                setUserId(data.user.id)
+            }
+        }
+        getUser()
+    }, [])
+
+    // WebSocket connection
+    useEffect(() => {
+        if (!userId || !pingId) return
+
+        const isDev = import.meta.env.DEV
+        const protocol = window.location.protocol === "https:" ? "wss:" : "ws:"
+        const wsUrl = isDev
+            ? `${protocol}//localhost:3001`
+            : `${protocol}//${window.location.host}`
+
+        const ws = new WebSocket(wsUrl)
+        wsRef.current = ws
+
+        ws.onopen = () => {
+            // Authenticate
+            ws.send(JSON.stringify({ type: "auth", userId }))
+
+            // Join ping room
+            setTimeout(() => {
+                ws.send(JSON.stringify({ type: "join", pingId, userId }))
+            }, 100)
+        }
+
+        ws.onmessage = (event) => {
+            try {
+                const data = JSON.parse(event.data)
+
+                if (data.type === "chat") {
+                    // Find user details from ping participants
+                    const user = initialPing?.participants?.find(
+                        (p: any) => p.user.id === data.userId
+                    )
+
+                    const newMessage: ChatMessage = {
+                        id: data.messageId,
+                        userId: data.userId,
+                        userName: user?.user?.name || "Unknown",
+                        userImage: user?.user?.image,
+                        text: data.content,
+                        timestamp: new Date(data.timestamp)
+                    }
+
+                    setMessages((prev) => [...prev, newMessage])
+                } else if (data.type === "user_joined") {
+                    // Optionally show "user joined" message
+                }
+            } catch {
+                // Invalid message
+            }
+        }
+
+        ws.onclose = () => {
+            wsRef.current = null
+        }
+
+        ws.onerror = () => {
+            // Error handling
+        }
+
+        return () => {
+            if (ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: "leave", pingId }))
+                ws.close()
+            }
+        }
+    }, [userId, pingId, initialPing])
+
+    // Scroll to bottom when new messages arrive
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+    }, [messages])
 
     const { data: pingsData } = useQuery({
         queryKey: [PINGS_QUERY_KEY],
@@ -75,25 +161,31 @@ function PingChatPage() {
         )
     }
 
-    const isCreator = ping.participants?.some(
-        (p: any) => p.isCreator && p.user.id === ping.creatorId
-    )
-
     const handleSendMessage = async () => {
-        if (!message.trim()) return
+        if (!message.trim() || !userId || !wsRef.current) return
 
-        // Add message locally
-        const newMessage = {
+        // Send via WebSocket
+        wsRef.current.send(
+            JSON.stringify({
+                type: "chat",
+                pingId,
+                userId,
+                content: message.trim()
+            })
+        )
+
+        // Add message locally (optimistic update)
+        const user = ping.participants?.find((p: any) => p.user.id === userId)
+        const newMessage: ChatMessage = {
             id: Math.random().toString(36).substring(2, 15),
-            userId: "current-user", // In real app, get from auth
-            text: message,
+            userId,
+            userName: user?.user?.name || "You",
+            userImage: user?.user?.image,
+            text: message.trim(),
             timestamp: new Date()
         }
         setMessages((prev) => [...prev, newMessage])
         setMessage("")
-
-        // Update ping activity to keep it alive
-        await updatePingActivity({ data: { pingId } })
     }
 
     return (
@@ -239,15 +331,20 @@ function PingChatPage() {
                             messages.map((msg) => (
                                 <div
                                     key={msg.id}
-                                    className={`flex ${msg.userId === "current-user" ? "justify-end" : "justify-start"}`}
+                                    className={`flex ${msg.userId === userId ? "justify-end" : "justify-start"}`}
                                 >
                                     <div
                                         className={`max-w-[70%] rounded-2xl px-4 py-2 ${
-                                            msg.userId === "current-user"
+                                            msg.userId === userId
                                                 ? "bg-primary text-primary-foreground rounded-br-md"
                                                 : "bg-muted rounded-bl-md"
                                         }`}
                                     >
+                                        {msg.userId !== userId && (
+                                            <p className="text-xs font-medium opacity-70 mb-1">
+                                                {msg.userName}
+                                            </p>
+                                        )}
                                         <p className="text-sm">{msg.text}</p>
                                         <span className="text-[10px] opacity-70">
                                             {msg.timestamp.toLocaleTimeString(
@@ -262,6 +359,7 @@ function PingChatPage() {
                                 </div>
                             ))
                         )}
+                        <div ref={messagesEndRef} />
                     </div>
 
                     {/* Message Input */}
