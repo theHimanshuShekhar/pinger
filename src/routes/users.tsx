@@ -27,7 +27,7 @@ export const Route = createFileRoute("/users")({
     beforeLoad: async () => {
         const user = await getCurrentUser()
         if (!user) {
-            throw redirect({ to: "/" })
+            throw redirect({ to: "/auth/login" })
         }
     },
     component: UsersPage,
