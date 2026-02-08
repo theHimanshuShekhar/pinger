@@ -16,10 +16,7 @@ const config = defineConfig({
         tailwindcss(),
         tanstackStart(),
         nitroV2Plugin({
-            compatibilityDate: "2024-06-01",
-            experimental: {
-                websocket: true // Enable Nitro native WebSocket support
-            }
+            compatibilityDate: "2024-06-01"
         }),
         viteReact(),
         devtoolsJson(),

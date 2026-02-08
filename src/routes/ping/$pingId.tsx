@@ -1,22 +1,11 @@
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, Link, useParams } from "@tanstack/react-router"
-import { ArrowLeft, Gamepad2, MessageSquare, Send, Users } from "lucide-react"
-import { useEffect, useRef, useState } from "react"
+import { ArrowLeft, Gamepad2, MessageSquare, Users } from "lucide-react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { authClient } from "@/lib/auth-client"
 import { getActivePings } from "@/lib/server/pings"
 
 const PINGS_QUERY_KEY = "pings"
-
-interface ChatMessage {
-    id: string
-    userId: string
-    userName: string
-    userImage?: string | null
-    text: string
-    timestamp: Date
-}
 
 export const Route = createFileRoute("/ping/$pingId")({
     component: PingChatPage,
@@ -42,92 +31,7 @@ function formatDateTime(dateStr: string | Date | null) {
 function PingChatPage() {
     const { pingId } = useParams({ from: "/ping/$pingId" })
     const { ping: initialPing } = Route.useLoaderData()
-    const [message, setMessage] = useState("")
-    const [messages, setMessages] = useState<ChatMessage[]>([])
-    const [userId, setUserId] = useState<string | null>(null)
-    const wsRef = useRef<WebSocket | null>(null)
-    const messagesEndRef = useRef<HTMLDivElement>(null)
-
-    // Get current user
-    useEffect(() => {
-        const getUser = async () => {
-            const { data } = await authClient.getSession()
-            if (data?.user) {
-                setUserId(data.user.id)
-            }
-        }
-        getUser()
-    }, [])
-
-    // WebSocket connection
-    useEffect(() => {
-        if (!userId || !pingId) return
-
-        const protocol = window.location.protocol === "https:" ? "wss:" : "ws:"
-        const wsUrl = `${protocol}//${window.location.host}/api/ws`
-
-        const ws = new WebSocket(wsUrl)
-        wsRef.current = ws
-
-        ws.onopen = () => {
-            // Authenticate
-            ws.send(JSON.stringify({ type: "auth", userId }))
-
-            // Join ping room
-            setTimeout(() => {
-                ws.send(JSON.stringify({ type: "join", pingId, userId }))
-            }, 100)
-        }
-
-        ws.onmessage = (event) => {
-            try {
-                const data = JSON.parse(event.data)
-
-                if (data.type === "chat") {
-                    // Find user details from ping participants
-                    const user = initialPing?.participants?.find(
-                        (p: any) => p.user.id === data.userId
-                    )
-
-                    const newMessage: ChatMessage = {
-                        id: data.messageId,
-                        userId: data.userId,
-                        userName: user?.user?.name || "Unknown",
-                        userImage: user?.user?.image,
-                        text: data.content,
-                        timestamp: new Date(data.timestamp)
-                    }
-
-                    setMessages((prev) => [...prev, newMessage])
-                } else if (data.type === "user_joined") {
-                    // Optionally show "user joined" message
-                }
-            } catch {
-                // Invalid message
-            }
-        }
-
-        ws.onclose = () => {
-            wsRef.current = null
-        }
-
-        ws.onerror = () => {
-            // Error handling
-        }
-
-        return () => {
-            if (ws.readyState === WebSocket.OPEN) {
-                ws.send(JSON.stringify({ type: "leave", pingId }))
-                ws.close()
-            }
-        }
-    }, [userId, pingId, initialPing])
-
-    // Scroll to bottom when new messages arrive
-    useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [messages])
+    const [showCopied, setShowCopied] = useState(false)
 
     const { data: pingsData } = useQuery({
         queryKey: [PINGS_QUERY_KEY],
@@ -159,31 +63,11 @@ function PingChatPage() {
         )
     }
 
-    const handleSendMessage = async () => {
-        if (!message.trim() || !userId || !wsRef.current) return
-
-        // Send via WebSocket
-        wsRef.current.send(
-            JSON.stringify({
-                type: "chat",
-                pingId,
-                userId,
-                content: message.trim()
-            })
-        )
-
-        // Add message locally (optimistic update)
-        const user = ping.participants?.find((p: any) => p.user.id === userId)
-        const newMessage: ChatMessage = {
-            id: Math.random().toString(36).substring(2, 15),
-            userId,
-            userName: user?.user?.name || "You",
-            userImage: user?.user?.image,
-            text: message.trim(),
-            timestamp: new Date()
-        }
-        setMessages((prev) => [...prev, newMessage])
-        setMessage("")
+    const handleCopyLink = () => {
+        const url = `${window.location.origin}/ping/${pingId}`
+        navigator.clipboard.writeText(url)
+        setShowCopied(true)
+        setTimeout(() => setShowCopied(false), 2000)
     }
 
     return (
@@ -314,78 +198,24 @@ function PingChatPage() {
                     </div>
                 </div>
 
-                {/* Chat Messages */}
+                {/* Chat Coming Soon */}
                 <div className="flex-1 min-h-0 bg-card rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.15)] border-2 border-border overflow-hidden flex flex-col">
-                    <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                        {messages.length === 0 ? (
-                            <div className="h-full flex flex-col items-center justify-center text-muted-foreground">
-                                <MessageSquare className="h-12 w-12 mb-2 opacity-20" />
-                                <p className="text-sm">No messages yet</p>
-                                <p className="text-xs">
-                                    Start the conversation!
-                                </p>
-                            </div>
-                        ) : (
-                            messages.map((msg) => (
-                                <div
-                                    key={msg.id}
-                                    className={`flex ${msg.userId === userId ? "justify-end" : "justify-start"}`}
-                                >
-                                    <div
-                                        className={`max-w-[70%] rounded-2xl px-4 py-2 ${
-                                            msg.userId === userId
-                                                ? "bg-primary text-primary-foreground rounded-br-md"
-                                                : "bg-muted rounded-bl-md"
-                                        }`}
-                                    >
-                                        {msg.userId !== userId && (
-                                            <p className="text-xs font-medium opacity-70 mb-1">
-                                                {msg.userName}
-                                            </p>
-                                        )}
-                                        <p className="text-sm">{msg.text}</p>
-                                        <span className="text-[10px] opacity-70">
-                                            {msg.timestamp.toLocaleTimeString(
-                                                [],
-                                                {
-                                                    hour: "2-digit",
-                                                    minute: "2-digit"
-                                                }
-                                            )}
-                                        </span>
-                                    </div>
-                                </div>
-                            ))
-                        )}
-                        <div ref={messagesEndRef} />
-                    </div>
-
-                    {/* Message Input */}
-                    <div className="p-3 border-t border-border bg-background">
-                        <div className="flex gap-2">
-                            <Input
-                                placeholder="Type a message..."
-                                value={message}
-                                onChange={(
-                                    e: React.ChangeEvent<HTMLInputElement>
-                                ) => setMessage(e.target.value)}
-                                onKeyDown={(
-                                    e: React.KeyboardEvent<HTMLInputElement>
-                                ) => {
-                                    if (e.key === "Enter" && !e.shiftKey) {
-                                        e.preventDefault()
-                                        handleSendMessage()
-                                    }
-                                }}
-                                className="flex-1"
-                            />
-                            <Button
-                                size="icon"
-                                onClick={handleSendMessage}
-                                disabled={!message.trim()}
-                            >
-                                <Send className="h-4 w-4" />
+                    <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground p-8">
+                        <MessageSquare className="h-16 w-16 mb-4 opacity-20" />
+                        <p className="text-lg font-medium mb-2">
+                            Real-time chat coming soon
+                        </p>
+                        <p className="text-sm text-center mb-6 max-w-md">
+                            We're working on adding real-time chat functionality
+                            to make it easier to coordinate with your friends.
+                        </p>
+                        <div className="flex gap-3">
+                            <Button variant="outline" onClick={handleCopyLink}>
+                                {showCopied ? "Copied!" : "Copy Ping Link"}
                             </Button>
+                            <Link to="/">
+                                <Button>Back to Home</Button>
+                            </Link>
                         </div>
                     </div>
                 </div>
