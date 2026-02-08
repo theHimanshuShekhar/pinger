@@ -28,12 +28,7 @@ RUN apk add --no-cache dumb-init && \
 # Copy built application
 COPY --from=builder /app/.output ./.output
 COPY --from=builder /app/server.mjs ./server.mjs
-COPY --from=builder /app/package.json ./package.json
-
-# Install production dependencies for custom server (ws package)
-RUN npm install --omit=dev --ignore-scripts ws && \
-    npm cache clean --force && \
-    rm -rf /root/.npm
+COPY --from=builder /app/node_modules ./node_modules
 
 # Set environment and expose port
 ENV NODE_ENV=production
