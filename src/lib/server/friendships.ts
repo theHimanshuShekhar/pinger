@@ -135,7 +135,7 @@ export const getFriendshipStatusesForUsers = createServerFn({
         .where(
             and(
                 or(
-                    ...userIds.map((userId) =>
+                    ...userIds.map((userId: string) =>
                         or(
                             and(
                                 eq(friendships.senderId, session.user.id),
@@ -156,8 +156,7 @@ export const getFriendshipStatusesForUsers = createServerFn({
             )
         )
 
-    const statusMap: Record<string, { status: string; senderId?: string }> =
-        {}
+    const statusMap: Record<string, { status: string; senderId?: string }> = {}
 
     for (const friendship of userFriendships) {
         const otherUserId =

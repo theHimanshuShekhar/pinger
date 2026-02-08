@@ -27,7 +27,7 @@ export const Route = createFileRoute("/users")({
     beforeLoad: async () => {
         const user = await getCurrentUser()
         if (!user) {
-            throw redirect({ to: "/auth/login" })
+            throw redirect({ to: "/auth/$path", params: { path: "login" } })
         }
     },
     component: UsersPage,
@@ -36,13 +36,6 @@ export const Route = createFileRoute("/users")({
         return { users }
     }
 })
-
-interface User {
-    id: string
-    name: string
-    email: string
-    image: string | null
-}
 
 function UsersPage() {
     const queryClient = useQueryClient()
@@ -56,7 +49,16 @@ function UsersPage() {
             if (!searchQuery.trim()) {
                 return getAllUsers()
             }
-            return searchUsers({ data: { q: searchQuery } })
+            return (searchUsers as any)({
+                data: { q: searchQuery }
+            }) as Promise<
+                Array<{
+                    id: string
+                    name: string
+                    email: string
+                    image: string | null
+                }>
+            >
         },
         initialData: searchQuery ? undefined : initialUsers
     })
@@ -71,7 +73,9 @@ function UsersPage() {
             queryFn: async () => {
                 if (users.length === 0) return {}
                 const userIds = users.map((user) => user.id)
-                return getFriendshipStatusesForUsers({ data: { userIds } })
+                return (getFriendshipStatusesForUsers as any)({
+                    data: { userIds }
+                })
             },
             enabled: users.length > 0
         })
@@ -79,7 +83,7 @@ function UsersPage() {
     // Mutation for sending friend requests
     const sendRequestMutation = useMutation({
         mutationFn: async (receiverId: string) => {
-            await sendFriendRequest({ data: { receiverId } })
+            await (sendFriendRequest as any)({ data: { receiverId } })
         },
         onSuccess: (_, receiverId) => {
             // Update local cache

@@ -54,7 +54,7 @@ function FriendRequestItem({
 
     const respondMutation = useMutation({
         mutationFn: async (action: "accept" | "deny") => {
-            await respondToFriendRequest({
+            await (respondToFriendRequest as any)({
                 data: { friendshipId: request.friendship.id, action }
             })
         },
@@ -175,7 +175,7 @@ function IndexPage() {
             pingId: string
             action: "accept" | "decline"
         }) => {
-            await respondToPingInvite({ data: { pingId, action } })
+            await (respondToPingInvite as any)({ data: { pingId, action } })
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [PINGS_QUERY_KEY] })
@@ -256,7 +256,8 @@ function IndexPage() {
                                         </Button>
 
                                         <Link
-                                            to={`/ping/${ping.id}`}
+                                            to="/ping/$pingId"
+                                            params={{ pingId: ping.id }}
                                             className="block p-3"
                                         >
                                             {/* Decorative top accent */}
@@ -452,7 +453,8 @@ function IndexPage() {
                                         </div>
 
                                         <Link
-                                            to={`/ping/${ping.id}`}
+                                            to="/ping/$pingId"
+                                            params={{ pingId: ping.id }}
                                             className="block p-3"
                                         >
                                             {/* Decorative top accent */}

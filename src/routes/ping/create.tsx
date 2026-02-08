@@ -65,7 +65,7 @@ function CreatePingPage() {
     const createPingMutation = useMutation({
         mutationFn: async () => {
             const finalGame = game === "custom" ? customGame : game
-            return createPing({
+            return (createPing as any)({
                 data: {
                     message: message || undefined,
                     game: finalGame || undefined,

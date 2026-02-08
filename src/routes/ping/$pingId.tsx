@@ -1,19 +1,11 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, Link, useParams } from "@tanstack/react-router"
-import {
-    ArrowLeft,
-    Gamepad2,
-    LogOut,
-    MessageSquare,
-    Send,
-    Users,
-    X
-} from "lucide-react"
+import { ArrowLeft, Gamepad2, MessageSquare, Send, Users } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { authClient } from "@/lib/auth-client"
-import { getActivePings, respondToPingInvite } from "@/lib/server/pings"
+import { getActivePings } from "@/lib/server/pings"
 
 const PINGS_QUERY_KEY = "pings"
 
@@ -21,7 +13,7 @@ interface ChatMessage {
     id: string
     userId: string
     userName: string
-    userImage?: string
+    userImage?: string | null
     text: string
     timestamp: Date
 }
@@ -71,11 +63,8 @@ function PingChatPage() {
     useEffect(() => {
         if (!userId || !pingId) return
 
-        const isDev = import.meta.env.DEV
         const protocol = window.location.protocol === "https:" ? "wss:" : "ws:"
-        const wsUrl = isDev
-            ? `${protocol}//localhost:3001`
-            : `${protocol}//${window.location.host}`
+        const wsUrl = `${protocol}//${window.location.host}/api/ws`
 
         const ws = new WebSocket(wsUrl)
         wsRef.current = ws
@@ -137,6 +126,7 @@ function PingChatPage() {
     // Scroll to bottom when new messages arrive
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [messages])
 
     const { data: pingsData } = useQuery({

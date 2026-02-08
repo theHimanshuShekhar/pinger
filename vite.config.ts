@@ -3,26 +3,10 @@ import tailwindcss from "@tailwindcss/vite"
 import { nitroV2Plugin } from "@tanstack/nitro-v2-vite-plugin"
 import { tanstackStart } from "@tanstack/react-start/plugin/vite"
 import viteReact from "@vitejs/plugin-react"
-import { defineConfig, type ViteDevServer } from "vite"
+import { defineConfig } from "vite"
 import devtoolsJson from "vite-plugin-devtools-json"
 import { VitePWA } from "vite-plugin-pwa"
 import viteTsConfigPaths from "vite-tsconfig-paths"
-import { PresenceWebSocketServer } from "./src/server/websocket"
-
-function websocketDevPlugin() {
-    return {
-        name: "websocket-dev-server",
-        configureServer(_server: ViteDevServer) {
-            try {
-                // In dev mode, use separate port to avoid Vite HMR conflicts
-                const wsServer = new PresenceWebSocketServer()
-                wsServer.startStandalone(3001, "localhost")
-            } catch {
-                // WebSocket server failed to start
-            }
-        }
-    }
-}
 
 const config = defineConfig({
     plugins: [
@@ -34,13 +18,11 @@ const config = defineConfig({
         nitroV2Plugin({
             compatibilityDate: "2024-06-01",
             experimental: {
-                websocket: false // Disabled - using custom WebSocket server
-            },
-            plugins: ["./src/server/index.ts"]
+                websocket: true // Enable Nitro native WebSocket support
+            }
         }),
         viteReact(),
         devtoolsJson(),
-        websocketDevPlugin(),
         VitePWA({
             registerType: "autoUpdate",
             injectRegister: "auto",
