@@ -27,6 +27,7 @@ RUN apk add --no-cache dumb-init && \
 
 # Copy built application
 COPY --from=builder /app/.output ./.output
+COPY --from=builder /app/server.mjs ./server.mjs
 
 # Install production dependencies if needed by the server bundle
 RUN if [ -f .output/server/package.json ]; then \
@@ -41,4 +42,4 @@ ENV NODE_ENV=production
 EXPOSE 3000
 
 # Use dumb-init to handle signals properly
-ENTRYPOINT ["dumb-init", "--", "node", ".output/server/index.mjs"]
+ENTRYPOINT ["dumb-init", "--", "node", "server.mjs"]
