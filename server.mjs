@@ -4,7 +4,9 @@ import { WebSocketServer } from "ws"
 
 async function startServer() {
     // Import the Nitro app
-    const { default: nitroApp } = await import("./chunks/nitro/nitro.mjs")
+    const { default: nitroApp } = await import(
+        "./.output/server/chunks/nitro/nitro.mjs"
+    )
 
     // Create HTTP server
     const server = createServer((req, res) => {
