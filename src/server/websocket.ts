@@ -23,23 +23,6 @@ interface ChatMessage {
     messageId: string
 }
 
-interface JoinMessage {
-    type: "join"
-    pingId: string
-    userId: string
-}
-
-interface LeaveMessage {
-    type: "leave"
-    pingId: string
-    userId: string
-}
-
-interface ErrorMessage {
-    type: "error"
-    error: string
-}
-
 // Client metadata attached to WebSocket
 interface ClientMeta {
     userId?: string
@@ -73,6 +56,14 @@ export class PresenceWebSocketServer {
             ws.on("close", () => {
                 this.handleDisconnect(ws)
             })
+
+            ws.on("error", (error) => {
+                console.error("WebSocket error:", error)
+            })
+        })
+
+        this.wss.on("error", (error) => {
+            console.error("WebSocketServer error:", error)
         })
     }
 
@@ -82,6 +73,8 @@ export class PresenceWebSocketServer {
             host,
             verifyClient: () => true
         })
+
+        console.log(`WebSocket server started on ${host}:${port}`)
 
         this.wss.on("connection", (ws: WebSocketWithMeta) => {
             ws.meta = {}
@@ -95,6 +88,14 @@ export class PresenceWebSocketServer {
             ws.on("close", () => {
                 this.handleDisconnect(ws)
             })
+
+            ws.on("error", (error) => {
+                console.error("WebSocket error:", error)
+            })
+        })
+
+        this.wss.on("error", (error) => {
+            console.error("WebSocketServer error:", error)
         })
     }
 
